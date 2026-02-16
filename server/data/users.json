@@ -1,0 +1,32 @@
+{
+  "users": [
+    {
+      "id": "6de43ffe-dba7-4ff7-93e4-8c8978e28eda",
+      "username": "superadmin",
+      "password": "password",
+      "role": "super_admin",
+      "name": "Super Admin"
+    },
+    {
+      "id": "13fecb57-16ce-4c5e-b5d8-a8262c61cfd4",
+      "username": "admin",
+      "password": "password",
+      "role": "admin",
+      "name": "Admin"
+    },
+    {
+      "username": "customer@test.com",
+      "password": "password",
+      "name": "Test Customer",
+      "role": "customer",
+      "id": "b0924d03-3770-419c-8545-b2444e51ff01"
+    },
+    {
+      "id": "d01a7f69-2ffa-4756-b2bb-2e2911c7aa88",
+      "username": "customer",
+      "password": "password",
+      "role": "customer",
+      "name": "Demo Customer"
+    }
+  ]
+}

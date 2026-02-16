@@ -1,0 +1,309 @@
+{
+  "quotes": [
+    {
+      "id": "1771232318189",
+      "quoteNumber": "QT-000012",
+      "referenceNumber": "",
+      "date": "2026-02-16",
+      "expiryDate": "2026-02-10",
+      "customerId": "4",
+      "customerName": "Ganesh",
+      "billingAddress": {},
+      "shippingAddress": {},
+      "salesperson": "Sujay",
+      "projectName": "",
+      "subject": "",
+      "placeOfSupply": "",
+      "pdfTemplate": "Standard Template",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1771231762978",
+          "name": "Mac",
+          "description": "sffd",
+          "quantity": 1,
+          "unit": "",
+          "rate": 1200000,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 18,
+          "taxName": "GST18",
+          "amount": 1200000
+        }
+      ],
+      "subTotal": 1200000,
+      "shippingCharges": 0,
+      "tdsType": "",
+      "tdsAmount": 0,
+      "cgst": 108000,
+      "sgst": 108000,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 1416000,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "CONVERTED",
+      "emailRecipients": [],
+      "createdAt": "2026-02-16T08:58:38.189Z",
+      "updatedAt": "2026-02-16T08:59:07.760Z",
+      "createdBy": "Admin User",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-16T08:58:38.189Z",
+          "action": "created",
+          "description": "Quote created for ₹14,16,000",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2026-02-16T08:59:07.760Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00005",
+          "user": "Admin User",
+          "link": "/invoices/1771232347760"
+        }
+      ],
+      "convertedTo": "invoice"
+    },
+    {
+      "id": "1770791750237",
+      "quoteNumber": "QT-000002",
+      "referenceNumber": "",
+      "date": "2026-02-11",
+      "expiryDate": "",
+      "customerId": "2",
+      "customerName": "Mr. Ganesh K",
+      "billingAddress": {},
+      "shippingAddress": {},
+      "salesperson": "",
+      "projectName": "",
+      "subject": "",
+      "placeOfSupply": "",
+      "pdfTemplate": "Standard Template",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1770351067854",
+          "name": "Laptop",
+          "description": "",
+          "quantity": 1,
+          "unit": "",
+          "rate": 15000,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 18,
+          "taxName": "GST18",
+          "amount": 15000
+        }
+      ],
+      "subTotal": 15000,
+      "shippingCharges": 0,
+      "tdsType": "",
+      "tdsAmount": 0,
+      "cgst": 1350,
+      "sgst": 1350,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 17700,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "CONVERTED",
+      "emailRecipients": [],
+      "createdAt": "2026-02-11T06:35:50.237Z",
+      "updatedAt": "2026-02-11T06:35:55.307Z",
+      "createdBy": "Admin User",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-11T06:35:50.237Z",
+          "action": "created",
+          "description": "Quote created for ₹17,700",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2026-02-11T06:35:55.307Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00004",
+          "user": "Admin User",
+          "link": "/invoices/1770791755307"
+        }
+      ],
+      "convertedTo": "invoice"
+    },
+    {
+      "id": "1770367332795",
+      "quoteNumber": "QT-000001",
+      "referenceNumber": "123",
+      "date": "2026-02-06",
+      "expiryDate": "2026-02-06",
+      "customerId": "1",
+      "customerName": "Mr. Sujay Palande",
+      "billingAddress": {
+        "street": "Hinjewadi  pune",
+        "city": "pune",
+        "state": "maharasta ",
+        "country": "India",
+        "pincode": "413104"
+      },
+      "shippingAddress": {
+        "street": "Hinjewadi  pune",
+        "city": "pune",
+        "state": "maharasta ",
+        "country": "India",
+        "pincode": "413104"
+      },
+      "salesperson": "Sujay",
+      "projectName": "",
+      "subject": "ok ",
+      "placeOfSupply": "",
+      "pdfTemplate": "Standard Template",
+      "items": [
+        {
+          "id": "1",
+          "itemId": "1770351067854",
+          "name": "Tab",
+          "description": "ok",
+          "quantity": 1,
+          "unit": "",
+          "rate": 15000,
+          "discount": 0,
+          "discountType": "percentage",
+          "tax": 5,
+          "taxName": "GST5",
+          "amount": 15000
+        }
+      ],
+      "subTotal": 15000,
+      "shippingCharges": 0,
+      "tdsType": "",
+      "tdsAmount": 0,
+      "cgst": 375,
+      "sgst": 375,
+      "igst": 0,
+      "adjustment": 0,
+      "total": 15750,
+      "customerNotes": "",
+      "termsAndConditions": "",
+      "status": "CONVERTED",
+      "emailRecipients": [],
+      "createdAt": "2026-02-06T08:42:12.794Z",
+      "updatedAt": "2026-02-06T08:43:02.965Z",
+      "createdBy": "Admin User",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-06T08:42:12.794Z",
+          "action": "created",
+          "description": "Quote created for ₹15,750",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2026-02-06T08:42:52.773Z",
+          "action": "updated",
+          "description": "Quote has been updated",
+          "user": "Admin User"
+        },
+        {
+          "id": "3",
+          "timestamp": "2026-02-06T08:43:02.965Z",
+          "action": "converted",
+          "description": "Converted to Sales Order SO-00001",
+          "user": "Admin User",
+          "link": "/sales-orders/1770367382966"
+        }
+      ],
+      "updatedBy": "Admin User",
+      "attachments": [],
+      "convertedTo": "sales-order"
+    },
+    {
+      "id": "11",
+      "quoteNumber": "REQ-000011",
+      "customerId": "4",
+      "organizationId": "1",
+      "date": "2026-02-16T08:49:43.911Z",
+      "status": "Requested",
+      "items": [
+        {
+          "name": "Mac",
+          "quantity": 3,
+          "description": "sffd"
+        }
+      ],
+      "total": 0,
+      "createdAt": "2026-02-16T08:49:43.911Z"
+    },
+    {
+      "id": "13",
+      "quoteNumber": "REQ-000013",
+      "customerId": "4",
+      "organizationId": "1",
+      "date": "2026-02-16T09:01:03.815Z",
+      "status": "Requested",
+      "items": [
+        {
+          "name": "Laptop",
+          "quantity": 2,
+          "description": ""
+        },
+        {
+          "name": "digital bharat ",
+          "quantity": 1,
+          "description": ""
+        }
+      ],
+      "total": 0,
+      "createdAt": "2026-02-16T09:01:03.815Z"
+    },
+    {
+      "id": "14",
+      "quoteNumber": "QT-000014",
+      "customerId": "4",
+      "customerName": "Ganesh",
+      "billingAddress": {
+        "street": "Bhumkar chowk, Pune",
+        "city": "",
+        "state": "",
+        "country": "",
+        "pincode": ""
+      },
+      "shippingAddress": {
+        "street": "Bhumkar chowk, Pune",
+        "city": "",
+        "state": "",
+        "country": "",
+        "pincode": ""
+      },
+      "organizationId": "1",
+      "date": "2026-02-16T09:41:24.649Z",
+      "status": "Approved",
+      "items": [
+        {
+          "id": "1",
+          "name": "Laptop",
+          "description": "",
+          "quantity": 1,
+          "rate": 15000,
+          "amount": 15000,
+          "unit": "set"
+        },
+        {
+          "id": "2",
+          "name": "Mac",
+          "description": "sffd",
+          "quantity": 1,
+          "rate": 1200000,
+          "amount": 1200000,
+          "unit": "pcs"
+        }
+      ],
+      "subTotal": 1215000,
+      "total": 1215000,
+      "createdAt": "2026-02-16T09:41:24.649Z"
+    }
+  ],
+  "nextQuoteNumber": 15
+}

@@ -1,0 +1,33 @@
+{
+  "itemRequests": [
+    {
+      "id": "1",
+      "customerId": "4",
+      "customerName": "Ganesh",
+      "customerEmail": "customer",
+      "companyName": "",
+      "contactNumber": "932048234",
+      "itemName": "Mac",
+      "description": "sffd",
+      "quantity": "11",
+      "status": "Approved",
+      "createdAt": "2026-02-16T07:29:16.700Z",
+      "rejectionReason": ""
+    },
+    {
+      "id": "2",
+      "customerId": "4",
+      "customerName": "Ganesh",
+      "customerEmail": "customer",
+      "companyName": "",
+      "contactNumber": "932048234",
+      "itemName": "Mac",
+      "description": "wdew",
+      "quantity": "14",
+      "status": "Rejected",
+      "createdAt": "2026-02-16T08:48:51.793Z",
+      "rejectionReason": "not available"
+    }
+  ],
+  "nextRequestId": 3
+}
