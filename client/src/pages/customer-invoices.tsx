@@ -62,8 +62,9 @@ export default function CustomerInvoicesPage() {
     const invoices = user?.role === 'customer' 
         ? allInvoices.filter((inv: any) => {
             const customerId = String(inv.customerId || inv.customer_id);
-            // Check for customer with ID 4 or matching email
-            return customerId === "4" || 
+            const userCustomerId = String(user.customerId || user.id);
+            // Check for matching customerId or matching email
+            return customerId === userCustomerId || 
                    (inv.customerEmail && inv.customerEmail.toLowerCase() === user.email?.toLowerCase());
           })
         : allInvoices;

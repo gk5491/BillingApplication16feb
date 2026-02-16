@@ -1116,20 +1116,20 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
             <div className="w-72 border-r border-slate-200 dark:border-slate-700 p-6 overflow-auto scrollbar-hide">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{customer.name}</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white" data-testid="text-customer-display-name">{customer.name}</h3>
                   {customer.contactPerson && (
                     <div className="flex items-center gap-2 mt-3">
                       <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
                         <User className="h-5 w-5 text-slate-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-800 font-display">{customer.contactPerson}</p>
-                        <p className="text-xs text-sidebar font-medium font-display">{customer.email}</p>
+                        <p className="text-sm font-bold text-slate-800 font-display" data-testid="text-contact-person">{customer.contactPerson}</p>
+                        <p className="text-xs text-sidebar font-medium font-display" data-testid="text-customer-email">{customer.email}</p>
                       </div>
                     </div>
                   )}
                   {!customer.contactPerson && customer.email && (
-                    <p className="text-sm text-sidebar font-medium mt-2 font-display">{customer.email}</p>
+                    <p className="text-sm text-sidebar font-medium mt-2 font-display" data-testid="text-customer-email-only">{customer.email}</p>
                   )}
                 </div>
 
