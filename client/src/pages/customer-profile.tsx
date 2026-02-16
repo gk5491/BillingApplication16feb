@@ -9,6 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import AppShell from "@/components/layout/AppShell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 
 import { CustomerForm, CustomerFormValues } from "@/modules/sales/components/CustomerForm";
 
@@ -114,47 +116,89 @@ export default function CustomerProfilePage() {
                 </TabsContent>
                 
                 <TabsContent value="comments">
-                    <Card className="border-slate-200 shadow-sm">
-                        <CardHeader>
-                            <CardTitle>Comments</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-slate-500 py-10 text-center italic">No comments available for your account.</p>
-                        </CardContent>
-                    </Card>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-bold font-display">Comments</h3>
+                        </div>
+                        <Card className="border-slate-200 shadow-sm">
+                            <CardContent className="pt-6">
+                                <div className="space-y-4">
+                                    <Textarea 
+                                        placeholder="Add a comment..." 
+                                        className="min-h-[100px] bg-slate-50 border-slate-200 focus:border-blue-400"
+                                    />
+                                    <div className="flex justify-end">
+                                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-bold font-display">
+                                            Add Comment
+                                        </Button>
+                                    </div>
+                                    <div className="border-t border-slate-100 pt-4">
+                                        <p className="text-slate-500 py-6 text-center italic">No comments available for your account.</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="transactions">
-                    <Card className="border-slate-200 shadow-sm">
-                        <CardHeader>
-                            <CardTitle>Transactions</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-slate-500 py-10 text-center italic">Transaction history will be displayed here.</p>
-                        </CardContent>
-                    </Card>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-bold font-display">Transaction History</h3>
+                        </div>
+                        <Card className="border-slate-200 shadow-sm">
+                            <CardContent className="p-0">
+                                <Table>
+                                    <TableHeader className="bg-slate-50">
+                                        <TableRow>
+                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider">Date</TableHead>
+                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider">Type</TableHead>
+                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider">Number</TableHead>
+                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider text-right">Amount</TableHead>
+                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider text-right">Status</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center py-20 text-slate-400 font-display italic">
+                                                Transaction history will be displayed here.
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="mails">
-                    <Card className="border-slate-200 shadow-sm">
-                        <CardHeader>
-                            <CardTitle>Mails</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-slate-500 py-10 text-center italic">No mail history found.</p>
-                        </CardContent>
-                    </Card>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-bold font-display">Sent Mails</h3>
+                        </div>
+                        <Card className="border-slate-200 shadow-sm">
+                            <CardContent className="pt-6">
+                                <p className="text-slate-500 py-10 text-center italic">No mail history found.</p>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </TabsContent>
 
                 <TabsContent value="statement">
-                    <Card className="border-slate-200 shadow-sm">
-                        <CardHeader>
-                            <CardTitle>Statement</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-slate-500 py-10 text-center italic">Your account statement will be generated here.</p>
-                        </CardContent>
-                    </Card>
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-bold font-display">Account Statement</h3>
+                            <div className="flex gap-2">
+                                <Button variant="outline" size="sm" className="font-bold font-display">Download PDF</Button>
+                                <Button variant="outline" size="sm" className="font-bold font-display">Print</Button>
+                            </div>
+                        </div>
+                        <Card className="border-slate-200 shadow-sm">
+                            <CardContent className="pt-6">
+                                <p className="text-slate-500 py-10 text-center italic font-display">Your account statement will be generated here.</p>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </TabsContent>
             </Tabs>
         </div>

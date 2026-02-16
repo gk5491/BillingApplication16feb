@@ -430,6 +430,22 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
     }
   };
 
+  const handleUpdateProfile = async (data: any) => {
+    try {
+      const response = await fetch(`/api/customers/${customer.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (response.ok) {
+        toast({ title: "Profile updated successfully" });
+        fetchCustomerData();
+      }
+    } catch (error) {
+      toast({ title: "Failed to update profile", variant: "destructive" });
+    }
+  };
+
   const handleAddComment = async () => {
     if (!newComment.trim() || isAddingComment) return;
     setIsAddingComment(true);
