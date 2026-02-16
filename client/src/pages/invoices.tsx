@@ -470,7 +470,7 @@ export default function Invoices() {
         }
     };
 
-    const handleMarkAsSent = async () => {
+    const handleMarkAsSentInDropdown = async () => {
         if (!selectedInvoice) return;
         try {
             const response = await fetch(`/api/invoices/${selectedInvoice.id}/status`, {
@@ -1209,7 +1209,7 @@ export default function Invoices() {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-56">
-                                        <DropdownMenuItem onClick={handleMarkAsSent} data-testid="menu-mark-as-sent">
+                                        <DropdownMenuItem onClick={handleMarkAsSentInDropdown} data-testid="menu-mark-as-sent">
                                             <CheckCircle className="mr-2 h-4 w-4 text-blue-600" />
                                             <span className="text-blue-600 font-medium">Mark As Sent</span>
                                         </DropdownMenuItem>
