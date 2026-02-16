@@ -33,14 +33,14 @@ export default function CustomerDashboard() {
             color: "text-purple-500",
             bg: "bg-purple-50"
         },
-        // {
-        //   title: "My Invoices",
-        //   description: "View and pay your invoices",
-        //   icon: Package,
-        //   href: "/customer/invoices",
-        //   color: "text-orange-500",
-        //   bg: "bg-orange-50"
-        // }
+        {
+            title: "My Invoices",
+            description: "View and pay your invoices",
+            icon: Package,
+            href: "/customer/invoices",
+            color: "text-orange-500",
+            bg: "bg-orange-50"
+        }
     ];
 
     return (

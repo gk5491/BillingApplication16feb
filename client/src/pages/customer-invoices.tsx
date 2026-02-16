@@ -46,7 +46,7 @@ export default function CustomerInvoicesPage() {
     const [activeTab, setActiveTab] = useState("all");
 
     const { data: invoicesData, isLoading } = useQuery({
-        queryKey: ["/api/flow/invoices"],
+        queryKey: ["/api/invoices"],
     });
 
     const { data: brandingData } = useQuery({
@@ -67,16 +67,10 @@ export default function CustomerInvoicesPage() {
             return res.json();
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["/api/flow/invoices"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/invoices"] });
             toast({ title: "Payment Successful", description: "Your payment has been processed." });
             setPaymentDialogOpen(false);
             setInvoiceToPay(null);
-
-            // Refresh selected invoice data if it exists
-            if (selectedInvoice) {
-                // The query invalidation will trigger a refetch, but we can also manually find it in the new data if needed
-                // For simplicity, we'll let the next render pick it up from the data array
-            }
         },
         onError: () => {
             toast({ title: "Payment Failed", description: "Please try again.", variant: "destructive" });
@@ -100,13 +94,13 @@ export default function CustomerInvoicesPage() {
         const matchesSearch = invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase());
         const status = inv.status || "";
 
-        // Customers should only see invoices that have been Sent, Paid, or are Overdue
-        // Draft invoices are for internal admin use only
-        if (status === 'Draft' || status === 'DRAFT') return false;
+        // Customers should see Sent, Paid, Overdue, and Partially Paid invoices
+        // Only Draft invoices are hidden
+        if (status.toUpperCase() === 'DRAFT') return false;
 
         const matchesTab = activeTab === "all" ||
-            (activeTab === "paid" && status === "Paid") ||
-            (activeTab === "unpaid" && (status === "Sent" || status === "Overdue" || status === "Partially Paid"));
+            (activeTab === "paid" && (status === "Paid" || status === "PAID")) ||
+            (activeTab === "unpaid" && (status === "Sent" || status === "Overdue" || status === "Partially Paid" || status === "PARTIALLY_PAID"));
         return matchesSearch && matchesTab;
     });
 
@@ -259,7 +253,7 @@ export default function CustomerInvoicesPage() {
                         onClose={() => setSelectedInvoice(null)}
                         isAdmin={false}
                         branding={branding}
-                        onRefresh={() => queryClient.invalidateQueries({ queryKey: ["/api/flow/invoices"] })}
+                        onRefresh={() => queryClient.invalidateQueries({ queryKey: ["/api/invoices"] })}
                     />
                 </div>
             )}

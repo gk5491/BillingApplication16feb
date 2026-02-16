@@ -76,6 +76,7 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
     const statusStyles = getStatusStyles(invoice.status);
 
     useEffect(() => {
+        // Force PDF view for customers and disable toggle
         if (!isAdmin) {
             setShowPdfPreview(true);
         }
@@ -84,6 +85,7 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
     const handleRecordPayment = async () => {
         try {
             // Determine which API to use based on isAdmin prop
+            // Record payment from customer invoice should use the /pay endpoint
             const apiEndpoint = isAdmin 
                 ? `/api/invoices/${invoice.id}/record-payment`
                 : `/api/flow/invoices/${invoice.id}/pay`;
@@ -92,7 +94,7 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: invoice.balanceDue,
+                    amount: invoice.balanceDue || invoice.total,
                     paymentMode: 'Bank Transfer',
                     date: new Date().toISOString()
                 })
@@ -172,14 +174,14 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
                         <Switch checked={showPdfPreview} onCheckedChange={isAdmin ? setShowPdfPreview : undefined} className="scale-75" disabled={!isAdmin} />
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-sidebar/10 text-sidebar/70" onClick={handleDownloadPDF}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-sidebar/10 text-sidebar/70" onClick={handleDownloadPDF} data-testid="button-download-pdf">
                             <Download className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-sidebar/10 text-sidebar/70" onClick={handlePrintPDF}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-sidebar/10 text-sidebar/70" onClick={handlePrintPDF} data-testid="button-print-pdf">
                             <Printer className="h-4 w-4" />
                         </Button>
                         {isAdmin && (
-                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-50 text-red-500" onClick={() => setDeleteDialogOpen(true)}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-red-50 text-red-500" onClick={() => setDeleteDialogOpen(true)} data-testid="button-delete-invoice">
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         )}
@@ -191,22 +193,22 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
             <div className="flex items-center gap-2 px-6 py-2 border-b border-slate-200 bg-white overflow-x-auto scrollbar-hide">
                 {isAdmin ? (
                     <>
-                        <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-blue-600 font-bold font-display hover:bg-blue-50" onClick={handleSendInvoice}>
+                        <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-blue-600 font-bold font-display hover:bg-blue-50" onClick={handleSendInvoice} data-testid="button-send-invoice">
                             <Send className="h-3.5 w-3.5" /> Send to Customer
                         </Button>
                         {invoice.status?.toLowerCase() !== 'paid' && invoice.status?.toLowerCase() !== 'draft' && (
-                            <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-green-600 font-bold font-display hover:bg-green-50" onClick={handleRecordPayment}>
+                            <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-green-600 font-bold font-display hover:bg-green-50" onClick={handleRecordPayment} data-testid="button-record-payment">
                                 <CheckCircle className="h-3.5 w-3.5" /> Record Payment
                             </Button>
                         )}
-                        <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-slate-600 font-bold font-display">
+                        <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-slate-600 font-bold font-display" data-testid="button-edit-invoice">
                             <Pencil className="h-3.5 w-3.5" /> Edit
                         </Button>
                     </>
                 ) : (
                     <>
                         {invoice.status?.toLowerCase() !== 'paid' && (
-                            <Button className="h-8 gap-1.5 bg-green-600 hover:bg-green-700 text-white font-bold font-display shadow-sm" onClick={handleRecordPayment}>
+                            <Button className="h-8 gap-1.5 bg-green-600 hover:bg-green-700 text-white font-bold font-display shadow-sm" onClick={handleRecordPayment} data-testid="button-customer-record-payment">
                                 <CheckCircle className="h-3.5 w-3.5" /> Record Payment
                             </Button>
                         )}
