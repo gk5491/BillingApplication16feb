@@ -376,7 +376,93 @@
           "link": "/invoices/1771242777740"
         }
       ]
+    },
+    {
+      "id": "16",
+      "quoteNumber": "QT-000016",
+      "customerId": "4",
+      "customerName": "Ganesh",
+      "billingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "shippingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "organizationId": "1",
+      "date": "2026-02-16T12:18:22.975Z",
+      "status": "Approved",
+      "items": [
+        {
+          "id": "1",
+          "name": "digital bharat ",
+          "description": "",
+          "quantity": 3,
+          "rate": 12000,
+          "amount": 36000,
+          "unit": "pcs"
+        }
+      ],
+      "subTotal": 36000,
+      "total": 36000,
+      "createdAt": "2026-02-16T12:18:22.975Z",
+      "convertedTo": "invoice",
+      "updatedAt": "2026-02-16T12:19:12.624Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-16T12:19:12.624Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00014",
+          "user": "Admin User",
+          "link": "/invoices/1771244352624"
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "quoteNumber": "QT-000017",
+      "customerId": "4",
+      "customerName": "Ganesh",
+      "billingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "shippingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "organizationId": "1",
+      "date": "2026-02-16T12:18:23.929Z",
+      "status": "Scrapped",
+      "items": [
+        {
+          "id": "1",
+          "name": "digital bharat ",
+          "description": "",
+          "quantity": 3,
+          "rate": 12000,
+          "amount": 36000,
+          "unit": "pcs"
+        }
+      ],
+      "subTotal": 36000,
+      "total": 36000,
+      "createdAt": "2026-02-16T12:18:23.929Z"
     }
   ],
-  "nextQuoteNumber": 16
+  "nextQuoteNumber": 18
 }

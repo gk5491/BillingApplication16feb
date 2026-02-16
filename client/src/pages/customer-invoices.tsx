@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useAuthStore } from "@/store/authStore";
 import {
     FileText,
     Search,
@@ -45,6 +46,7 @@ export default function CustomerInvoicesPage() {
     const [paymentAmount, setPaymentAmount] = useState("");
     const [activeTab, setActiveTab] = useState("all");
 
+    const { user } = useAuthStore();
     const { data: invoicesData, isLoading } = useQuery({
         queryKey: ["/api/invoices"],
     });
@@ -53,8 +55,13 @@ export default function CustomerInvoicesPage() {
         queryKey: ["/api/branding"],
     });
 
-    const invoices = (invoicesData as any)?.data || [];
+    const allInvoices = (invoicesData as any)?.data || [];
     const branding = (brandingData as any)?.data;
+
+    // Filter invoices by customer email/ID if the user is a customer
+    const invoices = user?.role === 'customer' 
+        ? allInvoices.filter((inv: any) => inv.customerEmail === user.email)
+        : allInvoices;
 
     const payMutation = useMutation({
         mutationFn: async ({ id, amount }: { id: string, amount: number }) => {

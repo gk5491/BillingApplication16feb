@@ -187,6 +187,7 @@ const customerSchema = z.object({
   companyName: z.string().optional(),
   displayName: z.string().min(1, "Display Name is required"),
   email: z.string().email("Invalid email address").or(z.literal("")),
+  password: z.string().min(6, "Password must be at least 6 characters").optional(),
   workPhone: z.string().optional(),
   mobile: z.string().optional(),
   language: z.string().default("English"),
@@ -552,6 +553,7 @@ export default function CustomerCreate() {
       lastName: data.lastName || "",
       companyName: data.companyName || data.displayName,
       email: data.email || "",
+      password: data.password || "", // Include temporary password
       phone: data.workPhone || "",
       workPhone: data.workPhone || "",
       mobile: data.mobile || "",
