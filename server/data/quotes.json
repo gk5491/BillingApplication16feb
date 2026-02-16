@@ -363,7 +363,19 @@
       ],
       "subTotal": 15000,
       "total": 15000,
-      "createdAt": "2026-02-16T10:44:13.207Z"
+      "createdAt": "2026-02-16T10:44:13.207Z",
+      "convertedTo": "invoice",
+      "updatedAt": "2026-02-16T11:52:57.740Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-16T11:52:57.740Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00013",
+          "user": "Admin User",
+          "link": "/invoices/1771242777740"
+        }
+      ]
     }
   ],
   "nextQuoteNumber": 16
