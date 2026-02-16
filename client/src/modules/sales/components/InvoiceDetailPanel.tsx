@@ -100,25 +100,26 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
         }
     };
 
-    const handleRecordPayment = async () => {
+    const handleDownloadPDF = async () => {
+        toast({ title: "Preparing download...", description: "Please wait while we generate your PDF." });
         try {
-            const response = await fetch(`/api/invoices/${invoice.id}/record-payment`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: invoice.balanceDue,
-                    paymentMode: 'Bank Transfer',
-                    date: new Date().toISOString()
-                })
-            });
-            if (response.ok) {
-                toast({ title: "Payment Recorded", description: "Invoice status updated to Paid." });
-                if (onRefresh) onRefresh();
-            } else {
-                throw new Error("Failed to record payment");
+            const element = document.getElementById("invoice-pdf-content");
+            if (element) {
+                await generatePDFFromElement("invoice-pdf-content", `Invoice-${invoice.invoiceNumber}.pdf`);
+                toast({ title: "Success", description: "Invoice downloaded successfully." });
             }
         } catch (error) {
-            toast({ title: "Error", description: "Failed to record payment.", variant: "destructive" });
+            console.error("PDF generation error:", error);
+            toast({ title: "Error", description: "Failed to generate PDF.", variant: "destructive" });
+        }
+    };
+
+    const handlePrintPDF = async () => {
+        try {
+            await robustIframePrint("invoice-pdf-content");
+        } catch (error) {
+            console.error("Print error:", error);
+            toast({ title: "Error", description: "Failed to open print dialog.", variant: "destructive" });
         }
     };
 
@@ -143,7 +144,7 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-display">PDF View</span>
-                        <Switch checked={showPdfPreview} onCheckedChange={setShowPdfPreview} className="scale-75" />
+                        <Switch checked={showPdfPreview} onCheckedChange={isAdmin ? setShowPdfPreview : undefined} className="scale-75" disabled={!isAdmin} />
                     </div>
                 </div>
             </div>
@@ -152,16 +153,9 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
             <div className="flex items-center gap-2 px-6 py-2 border-b border-slate-200 bg-white overflow-x-auto scrollbar-hide">
                 {isAdmin ? (
                     <>
-                        {invoice.status?.toLowerCase() === 'draft' && (
-                            <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-slate-600 font-bold font-display" onClick={handleSendInvoice}>
-                                <Mail className="h-3.5 w-3.5" /> Send Invoice
-                            </Button>
-                        )}
-                        {invoice.status?.toLowerCase() === 'sent' && (
-                            <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-blue-600 font-bold font-display hover:bg-blue-50" onClick={handleSendPaymentLink}>
-                                <CreditCard className="h-3.5 w-3.5" /> Send Payment Link
-                            </Button>
-                        )}
+                        <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-blue-600 font-bold font-display hover:bg-blue-50" onClick={handleSendInvoice}>
+                            <Send className="h-3.5 w-3.5" /> Send to Customer
+                        </Button>
                         {invoice.status?.toLowerCase() !== 'paid' && invoice.status?.toLowerCase() !== 'draft' && (
                             <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-green-600 font-bold font-display hover:bg-green-50" onClick={handleRecordPayment}>
                                 <CheckCircle className="h-3.5 w-3.5" /> Record Payment
@@ -172,11 +166,13 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
                         </Button>
                     </>
                 ) : (
-                    invoice.status?.toLowerCase() !== 'paid' && (
-                        <Button className="h-8 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold font-display shadow-sm" onClick={() => setActiveTab("whats-next")}>
-                            <CreditCard className="h-3.5 w-3.5" /> Pay Now
-                        </Button>
-                    )
+                    <>
+                        {invoice.status?.toLowerCase() !== 'paid' && (
+                            <Button className="h-8 gap-1.5 bg-green-600 hover:bg-green-700 text-white font-bold font-display shadow-sm" onClick={handleRecordPayment}>
+                                <CheckCircle className="h-3.5 w-3.5" /> Record Payment
+                            </Button>
+                        )}
+                    </>
                 )}
 
                 <DropdownMenu>

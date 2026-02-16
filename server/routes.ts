@@ -3563,6 +3563,7 @@ export async function registerRoutes(
       quote.status = 'Approved';
       quote.convertedTo = 'invoice';
       quote.updatedAt = now;
+      if (!quote.activityLogs) quote.activityLogs = [];
       quote.activityLogs.push({
         id: String(quote.activityLogs.length + 1),
         timestamp: now,

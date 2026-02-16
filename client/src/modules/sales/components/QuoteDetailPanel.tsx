@@ -205,6 +205,7 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh, is
   };
 
   const handleConvertToInvoice = async () => {
+    if (!isAdmin) return;
     setIsConverting(true);
     try {
       const response = await fetch(`/api/quotes/${quote.id}/convert-to-invoice`, {
@@ -514,20 +515,22 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh, is
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-slate-600 font-bold font-display hover:bg-slate-50" disabled={isConverting || quote.status === 'CONVERTED'} data-testid="button-convert">
-              <RefreshCw className={`h-3.5 w-3.5 ${isConverting ? 'animate-spin' : ''}`} />
-              Convert
-              <ChevronDown className="h-3.5 w-3.5 opacity-50" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56 font-display">
-            <DropdownMenuItem onClick={handleConvertToInvoice} className="font-medium">
-              Convert to Invoice
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {isAdmin && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-slate-600 font-bold font-display hover:bg-slate-50" disabled={isConverting || quote.status === 'CONVERTED'} data-testid="button-convert">
+                <RefreshCw className={`h-3.5 w-3.5 ${isConverting ? 'animate-spin' : ''}`} />
+                Convert
+                <ChevronDown className="h-3.5 w-3.5 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56 font-display">
+              <DropdownMenuItem onClick={handleConvertToInvoice} className="font-medium">
+                Convert to Invoice
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
         <div className="h-4 w-[1px] bg-slate-200 mx-1" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -567,7 +570,7 @@ export default function QuoteDetailPanel({ quote, onClose, onEdit, onRefresh, is
           </div>
         </div>
       )}
-      {(quote.status === 'Sent' || quote.status === 'SENT' || quote.status === 'Approved' || quote.status === 'APPROVED' || quote.status === 'Accepted' || quote.status === 'ACCEPTED') && (
+      {isAdmin && (quote.status === 'Sent' || quote.status === 'SENT' || quote.status === 'Approved' || quote.status === 'APPROVED' || quote.status === 'Accepted' || quote.status === 'ACCEPTED') && (
         <div className="bg-sidebar/5 px-6 py-2.5 flex items-center justify-between border-b border-sidebar/10 gap-3 transition-colors">
           <div className="flex items-center gap-2.5 text-sm font-display">
             <span className="text-sidebar font-bold uppercase tracking-widest text-[11px]">WHAT'S NEXT?</span>

@@ -122,7 +122,12 @@ export default function CustomerQuotesPage() {
                                                             <Button size="sm" variant="outline" className="h-8 px-3 font-bold font-display text-red-600 hover:text-red-700 hover:bg-red-50 border-slate-200" onClick={() => handleAction(quote.id, 'reject')}>Reject</Button>
                                                         </>
                                                     )}
-                                                    {quote.status === "Approved" && <span className="text-green-600 font-bold font-display text-xs uppercase tracking-wider">Approved</span>}
+                                                    {quote.status === "Approved" && (
+                                                        <div className="flex flex-col items-end gap-1">
+                                                            <span className="text-green-600 font-bold font-display text-xs uppercase tracking-wider">Approved</span>
+                                                            <span className="text-slate-400 font-display text-[10px]">Converted to Invoice</span>
+                                                        </div>
+                                                    )}
                                                     {quote.status === "Scrapped" && <span className="text-red-600 font-bold font-display text-xs uppercase tracking-wider">Scrapped</span>}
                                                     {(quote.status === "Requested" || quote.status === "Draft") && <span className="text-slate-400 font-display text-xs">Waiting for Admin</span>}
                                                 </div>
