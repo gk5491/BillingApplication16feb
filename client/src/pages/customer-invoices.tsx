@@ -233,8 +233,8 @@ export default function CustomerInvoicesPage() {
                                             <TableCell className="text-right pr-6" onClick={(e) => e.stopPropagation()}>
                                                 <div className="flex items-center justify-end gap-2">
                                                     {invoice.status !== 'Paid' && (
-                                                        <Button size="sm" className="h-8 px-4 font-bold font-display bg-blue-600 hover:bg-blue-700" onClick={(e) => handlePayClick(e, invoice)}>
-                                                            Pay Now
+                                                        <Button size="sm" className="h-8 px-4 font-bold font-display bg-green-600 hover:bg-green-700 text-white shadow-sm" onClick={(e) => handlePayClick(e, invoice)}>
+                                                            <CheckCircle className="h-3.5 w-3.5 mr-1.5" /> Record Payment
                                                         </Button>
                                                     )}
                                                     <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-slate-100 text-slate-400 group-hover:text-blue-600" onClick={() => setSelectedInvoice(invoice)}>

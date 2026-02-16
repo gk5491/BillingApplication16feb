@@ -470,6 +470,24 @@ export default function Invoices() {
         }
     };
 
+    const handleMarkAsSent = async () => {
+        if (!selectedInvoice) return;
+        try {
+            const response = await fetch(`/api/invoices/${selectedInvoice.id}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'Sent' })
+            });
+            if (response.ok) {
+                toast({ title: "Invoice marked as sent" });
+                fetchInvoiceDetail(selectedInvoice.id);
+                fetchInvoices();
+            }
+        } catch (error) {
+            toast({ title: "Error", description: "Failed to mark as sent", variant: "destructive" });
+        }
+    };
+
     const handleSendInvoice = async () => {
         if (!selectedInvoice) return;
         try {

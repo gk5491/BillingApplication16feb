@@ -83,7 +83,12 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
 
     const handleRecordPayment = async () => {
         try {
-            const response = await fetch(`/api/invoices/${invoice.id}/record-payment`, {
+            // Determine which API to use based on isAdmin prop
+            const apiEndpoint = isAdmin 
+                ? `/api/invoices/${invoice.id}/record-payment`
+                : `/api/flow/invoices/${invoice.id}/pay`;
+            
+            const response = await fetch(apiEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -92,14 +97,16 @@ export default function InvoiceDetailPanel({ invoice, onClose, onRefresh, isAdmi
                     date: new Date().toISOString()
                 })
             });
+            
             if (response.ok) {
-                toast({ title: "Payment Recorded", description: "Invoice status updated to Paid." });
+                toast({ title: "Payment Recorded", description: "Invoice status updated successfully." });
                 if (onRefresh) onRefresh();
             } else {
-                throw new Error("Failed to record payment");
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || "Failed to record payment");
             }
-        } catch (error) {
-            toast({ title: "Error", description: "Failed to record payment.", variant: "destructive" });
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message || "Failed to record payment.", variant: "destructive" });
         }
     };
 

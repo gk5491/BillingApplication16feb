@@ -242,7 +242,7 @@
       "customerId": "4",
       "organizationId": "1",
       "date": "2026-02-16T09:01:03.815Z",
-      "status": "Requested",
+      "status": "Approved",
       "items": [
         {
           "name": "Laptop",
@@ -256,7 +256,19 @@
         }
       ],
       "total": 0,
-      "createdAt": "2026-02-16T09:01:03.815Z"
+      "createdAt": "2026-02-16T09:01:03.815Z",
+      "convertedTo": "invoice",
+      "updatedAt": "2026-02-16T11:43:05.230Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-16T11:43:05.230Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00011",
+          "user": "Admin User",
+          "link": "/invoices/1771242185230"
+        }
+      ]
     },
     {
       "id": "14",
@@ -302,7 +314,19 @@
       ],
       "subTotal": 1215000,
       "total": 1215000,
-      "createdAt": "2026-02-16T09:41:24.649Z"
+      "createdAt": "2026-02-16T09:41:24.649Z",
+      "convertedTo": "invoice",
+      "updatedAt": "2026-02-16T11:44:42.613Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-16T11:44:42.613Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00012",
+          "user": "Admin User",
+          "link": "/invoices/1771242282613"
+        }
+      ]
     },
     {
       "id": "15",
