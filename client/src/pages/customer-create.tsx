@@ -924,6 +924,25 @@ export default function CustomerCreate() {
                           />
                         </div>
                       </div>
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-700 font-bold font-display">Temporary Password</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="password"
+                                placeholder="Enter temporary password" 
+                                {...field} 
+                                className="bg-white border-slate-200 focus:border-blue-400 h-10 font-display"
+                              />
+                            </FormControl>
+                            <FormDescription>The customer will be prompted to change this on first login.</FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
                 </div>

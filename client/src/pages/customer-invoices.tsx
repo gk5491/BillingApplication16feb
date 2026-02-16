@@ -60,7 +60,7 @@ export default function CustomerInvoicesPage() {
 
     // Filter invoices by customer email/ID if the user is a customer
     const invoices = user?.role === 'customer' 
-        ? allInvoices.filter((inv: any) => inv.customerEmail === user.email)
+        ? allInvoices.filter((inv: any) => inv.customerId === user.id || inv.customerEmail === user.email)
         : allInvoices;
 
     const payMutation = useMutation({

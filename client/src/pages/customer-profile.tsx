@@ -23,6 +23,10 @@ export default function CustomerProfilePage() {
 
     const [activeTab, setActiveTab] = useState("overview");
 
+    const [transactions, setTransactions] = useState<any[]>([]);
+    const [mails, setMails] = useState<any[]>([]);
+    const [statementTransactions, setStatementTransactions] = useState<any[]>([]);
+
     useEffect(() => {
         // Fetch existing profile if available
         const fetchProfile = async () => {
@@ -34,6 +38,29 @@ export default function CustomerProfilePage() {
                     const data = await res.json();
                     if (data.data) {
                         setProfileData(data.data);
+                        
+                        // Fetch related data for tabs
+                        const [txRes, mailRes, invRes] = await Promise.all([
+                            fetch(`/api/customers/${data.data.id}/transactions`),
+                            fetch(`/api/customers/${data.data.id}/mails`),
+                            fetch("/api/invoices")
+                        ]);
+                        
+                        if (txRes.ok) {
+                            const txData = await txRes.json();
+                            setTransactions(txData.data?.invoices || []);
+                        }
+                        
+                        if (mailRes.ok) {
+                            const mailData = await mailRes.json();
+                            setMails(mailData.data || []);
+                        }
+
+                        if (invRes.ok) {
+                            const invData = await invRes.json();
+                            const filteredInvoices = (invData.data || []).filter((inv: any) => inv.customerId === data.data.id);
+                            setStatementTransactions(filteredInvoices);
+                        }
                     }
                 }
             } catch (error) {

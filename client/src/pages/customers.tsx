@@ -402,21 +402,34 @@ function CustomerDetailPanel({ customer, onClose, onEdit, onClone, onToggleStatu
 
   const fetchCustomerData = async () => {
     try {
-      const [commentsRes, transactionsRes, mailsRes, activitiesRes] = await Promise.all([
+      const [commentsRes, transactionsRes, mailsRes, activitiesRes, invoicesRes] = await Promise.all([
         fetch(`/api/customers/${customer.id}/comments`),
         fetch(`/api/customers/${customer.id}/transactions`),
         fetch(`/api/customers/${customer.id}/mails`),
-        fetch(`/api/customers/${customer.id}/activities`)
+        fetch(`/api/customers/${customer.id}/activities`),
+        fetch(`/api/invoices`)
       ]);
 
       if (commentsRes.ok) {
         const data = await commentsRes.json();
         setComments(data.data || []);
       }
+      
+      let customerTransactions = transactions;
       if (transactionsRes.ok) {
         const data = await transactionsRes.json();
-        setTransactions(data.data || transactions);
+        customerTransactions = data.data || transactions;
       }
+      
+      // Ensure invoices are correctly linked if transactions API doesn't return them
+      if (invoicesRes.ok) {
+        const invoicesData = await invoicesRes.json();
+        const filteredInvoices = (invoicesData.data || []).filter((inv: any) => inv.customerId === customer.id);
+        customerTransactions.invoices = filteredInvoices;
+      }
+      
+      setTransactions(customerTransactions);
+
       if (mailsRes.ok) {
         const data = await mailsRes.json();
         setMails(data.data || []);
