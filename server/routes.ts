@@ -3421,6 +3421,81 @@ export async function registerRoutes(
   });
 
   // Quote to Invoice/Sales Order conversion
+  app.post("/api/flow/quotes/:id/approve", (req: Request, res: Response) => {
+    try {
+      const quotesData = readQuotesData();
+      const quoteIndex = quotesData.quotes.findIndex((q: any) => q.id === req.params.id);
+      if (quoteIndex === -1) return res.status(404).json({ success: false, message: 'Quote not found' });
+      const quote = quotesData.quotes[quoteIndex];
+      const now = new Date().toISOString();
+      
+      quote.status = 'Approved';
+      quote.updatedAt = now;
+      if (!quote.activityLogs) quote.activityLogs = [];
+      quote.activityLogs.push({
+        id: String(quote.activityLogs.length + 1),
+        timestamp: now,
+        action: 'approved',
+        description: 'Quote has been approved',
+        user: 'Admin User'
+      });
+      quotesData.quotes[quoteIndex] = quote;
+      writeQuotesData(quotesData);
+      res.json({ success: true, message: 'Quote approved successfully', data: quote });
+    } catch (error) {
+      res.status(500).json({ success: false, message: 'Failed to approve quote' });
+    }
+  });
+  app.post("/api/flow/quotes/:id/scrap", (req: Request, res: Response) => {
+    try {
+      const quotesData = readQuotesData();
+      const quoteIndex = quotesData.quotes.findIndex((q: any) => q.id === req.params.id);
+      if (quoteIndex === -1) return res.status(404).json({ success: false, message: 'Quote not found' });
+      const quote = quotesData.quotes[quoteIndex];
+      const now = new Date().toISOString();
+      
+      quote.status = 'Scrapped';
+      quote.updatedAt = now;
+      if (!quote.activityLogs) quote.activityLogs = [];
+      quote.activityLogs.push({
+        id: String(quote.activityLogs.length + 1),
+        timestamp: now,
+        action: 'scrapped',
+        description: 'Quote has been marked as scrapped',
+        user: 'Admin User'
+      });
+      quotesData.quotes[quoteIndex] = quote;
+      writeQuotesData(quotesData);
+      res.json({ success: true, message: 'Quote scrapped successfully', data: quote });
+    } catch (error) {
+      res.status(500).json({ success: false, message: 'Failed to scrap quote' });
+    }
+  });
+  app.post("/api/flow/quotes/:id/reject", (req: Request, res: Response) => {
+    try {
+      const quotesData = readQuotesData();
+      const quoteIndex = quotesData.quotes.findIndex((q: any) => q.id === req.params.id);
+      if (quoteIndex === -1) return res.status(404).json({ success: false, message: 'Quote not found' });
+      const quote = quotesData.quotes[quoteIndex];
+      const now = new Date().toISOString();
+      
+      quote.status = 'Declined';
+      quote.updatedAt = now;
+      if (!quote.activityLogs) quote.activityLogs = [];
+      quote.activityLogs.push({
+        id: String(quote.activityLogs.length + 1),
+        timestamp: now,
+        action: 'declined',
+        description: 'Quote has been rejected',
+        user: 'Customer'
+      });
+      quotesData.quotes[quoteIndex] = quote;
+      writeQuotesData(quotesData);
+      res.json({ success: true, message: 'Quote rejected successfully', data: quote });
+    } catch (error) {
+      res.status(500).json({ success: false, message: 'Failed to reject quote' });
+    }
+  });
   app.post("/api/quotes/:id/convert-to-invoice", (req: Request, res: Response) => {
     try {
       const quotesData = readQuotesData();
@@ -3513,9 +3588,21 @@ export async function registerRoutes(
       const invoicesData = readInvoicesData();
       const invoiceIndex = invoicesData.invoices.findIndex((inv: any) => inv.id === req.params.id);
       if (invoiceIndex === -1) return res.status(404).json({ success: false, message: "Invoice not found" });
+       const now = new Date().toISOString();
 
       invoicesData.invoices[invoiceIndex].status = "Sent";
-      invoicesData.invoices[invoiceIndex].updatedAt = new Date().toISOString();
+invoicesData.invoices[invoiceIndex].updatedAt = now;
+      
+      if (!invoicesData.invoices[invoiceIndex].activityLogs) {
+        invoicesData.invoices[invoiceIndex].activityLogs = [];
+      }
+      invoicesData.invoices[invoiceIndex].activityLogs.push({
+        id: String(invoicesData.invoices[invoiceIndex].activityLogs.length + 1),
+        timestamp: now,
+        action: 'sent',
+        description: 'Invoice has been sent to customer',
+        user: req.body.user || 'Admin User'
+      });
       writeInvoicesData(invoicesData);
 
       res.json({ success: true, message: "Invoice marked as sent" });
@@ -3531,11 +3618,66 @@ export async function registerRoutes(
       if (invoiceIndex === -1) return res.status(404).json({ success: false, message: "Invoice not found" });
 
       // Simulate sending payment link
-      console.log(`[FLOW] Sending payment link for invoice ${invoicesData.invoices[invoiceIndex].invoiceNumber}`);
+      const now = new Date().toISOString();
+      invoicesData.invoices[invoiceIndex].paymentLinkSentAt = now;
+      
+      if (!invoicesData.invoices[invoiceIndex].activityLogs) {
+        invoicesData.invoices[invoiceIndex].activityLogs = [];
+      }
+      invoicesData.invoices[invoiceIndex].activityLogs.push({
+        id: String(invoicesData.invoices[invoiceIndex].activityLogs.length + 1),
+        timestamp: now,
+        action: 'payment_link_sent',
+        description: 'Payment link has been sent to customer',
+        user: req.body.user || 'Admin User'
+      });
+      writeInvoicesData(invoicesData);
       
       res.json({ success: true, message: "Payment link has been sent to the customer." });
     } catch (error) {
       res.status(500).json({ success: false, message: "Failed to send payment link" });
+     }
+  });
+  app.post("/api/invoices/:id/record-payment", (req: Request, res: Response) => {
+    try {
+      const invoicesData = readInvoicesData();
+      const invoiceIndex = invoicesData.invoices.findIndex((inv: any) => inv.id === req.params.id);
+      if (invoiceIndex === -1) return res.status(404).json({ success: false, message: "Invoice not found" });
+      const invoice = invoicesData.invoices[invoiceIndex];
+      const amount = Number(req.body.amount);
+      const now = new Date().toISOString();
+      if (!invoice.payments) invoice.payments = [];
+      invoice.payments.push({
+        id: `pay-${Date.now()}`,
+        amount,
+        paymentMode: req.body.paymentMode || 'Bank Transfer',
+        date: req.body.date || now,
+        timestamp: now
+      });
+      invoice.amountPaid = (Number(invoice.amountPaid) || 0) + amount;
+      invoice.balanceDue = Math.max(0, Number(invoice.total) - invoice.amountPaid);
+      if (invoice.balanceDue <= 0) {
+        invoice.status = 'Paid';
+        invoice.balanceDue = 0;
+      } else if (invoice.amountPaid > 0) {
+        invoice.status = 'Partially Paid';
+      }
+      invoice.updatedAt = now;
+      
+      if (!invoice.activityLogs) invoice.activityLogs = [];
+      invoice.activityLogs.push({
+        id: String(invoice.activityLogs.length + 1),
+        timestamp: now,
+        action: 'payment_recorded',
+        description: `Payment of ₹${amount.toLocaleString('en-IN')} recorded`,
+        user: req.body.user || 'Admin User'
+      });
+      writeInvoicesData(invoicesData);
+      res.json({ success: true, message: "Payment recorded successfully", data: invoice });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Failed to record payment" });
+    
+    
     }
   });
   app.post("/api/quotes/:id/convert-to-sales-order", (req: Request, res: Response) => {

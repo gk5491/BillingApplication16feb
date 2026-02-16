@@ -303,7 +303,44 @@
       "subTotal": 1215000,
       "total": 1215000,
       "createdAt": "2026-02-16T09:41:24.649Z"
+    },
+    {
+      "id": "15",
+      "quoteNumber": "QT-000015",
+      "customerId": "4",
+      "customerName": "Ganesh",
+      "billingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "shippingAddress": {
+        "street": "",
+        "city": "",
+        "state": "",
+        "country": "India",
+        "pincode": ""
+      },
+      "organizationId": "1",
+      "date": "2026-02-16T10:44:13.207Z",
+      "status": "Approved",
+      "items": [
+        {
+          "id": "1",
+          "name": "Laptop",
+          "description": "",
+          "quantity": 1,
+          "rate": 15000,
+          "amount": 15000,
+          "unit": "set"
+        }
+      ],
+      "subTotal": 15000,
+      "total": 15000,
+      "createdAt": "2026-02-16T10:44:13.207Z"
     }
   ],
-  "nextQuoteNumber": 15
+  "nextQuoteNumber": 16
 }
