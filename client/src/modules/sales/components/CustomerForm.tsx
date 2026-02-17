@@ -95,9 +95,10 @@ interface CustomerFormProps {
     onCancel?: () => void;
     isLoading?: boolean;
     isAdmin?: boolean;
+    isEdit?: boolean;
 }
 
-export function CustomerForm({ initialData, onSubmit, onCancel, isLoading, isAdmin }: CustomerFormProps) {
+export function CustomerForm({ initialData, onSubmit, onCancel, isLoading, isAdmin, isEdit }: CustomerFormProps) {
     const form = useForm<CustomerFormValues>({
         resolver: zodResolver(customerSchema),
         defaultValues: {
