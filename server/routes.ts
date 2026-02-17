@@ -2833,10 +2833,12 @@ export async function registerRoutes(
       // If user is a customer, always filter by their customer profile(s)
       if (user && user.role === 'customer') {
         const customersData = readCustomersData();
-        let linkedCustomers = customersData.customers.filter((c: any) => String(c.userId) === String(user.id));
-        if (linkedCustomers.length === 0 && user.email) {
-          linkedCustomers = customersData.customers.filter((c: any) => c.email === user.email);
-        }
+        // find all customer profiles linked to this user's ID or email
+        // Standardize IDs for comparison
+        let linkedCustomers = customersData.customers.filter((c: any) => 
+          (c.userId && String(c.userId) === String(user.id)) || 
+          (c.email && user.email && String(c.email).toLowerCase() === String(user.email).toLowerCase())
+        );
         
         const customerIds = linkedCustomers.map((c: any) => String(c.id));
         console.log('Found Customer IDs for user:', customerIds);
