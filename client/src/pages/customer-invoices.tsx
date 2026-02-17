@@ -48,7 +48,7 @@ export default function CustomerInvoicesPage() {
 
     const { user } = useAuthStore();
     const { data: invoicesData, isLoading } = useQuery({
-        queryKey: user?.role === 'customer' ? ["/api/flow/invoices"] : ["/api/invoices"],
+        queryKey: ["/api/invoices"],
     });
 
     const { data: brandingData } = useQuery({
@@ -58,8 +58,6 @@ export default function CustomerInvoicesPage() {
     const allInvoices = (invoicesData as any)?.data || [];
     const branding = (brandingData as any)?.data;
 
-    // For customers, the /api/flow/invoices endpoint already filters by customer
-    // For admins, we use the regular /api/invoices endpoint
     const invoices = allInvoices;
 
     const payMutation = useMutation({

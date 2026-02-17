@@ -2801,6 +2801,12 @@ export async function registerRoutes(
     try {
       const data = readInvoicesData();
       const { customerId } = req.query;
+      const user = (req as any).user;
+
+      console.log('=== INVOICE DEBUG ===');
+      console.log('User Role:', user?.role);
+      console.log('User ID:', user?.id);
+      console.log('Query customerId:', customerId);
 
       let invoices = data.invoices.map((invoice: any) => {
         const total = Number(invoice.total || invoice.amount || 0);
@@ -2820,17 +2826,36 @@ export async function registerRoutes(
           terms: invoice.paymentTerms || 'Due on Receipt',
           amountPaid: paid,
           balanceDue: status === 'Paid' ? 0 : Math.max(0, total - paid),
-          _debug: "FIX_APPLIED_V3"
+          _debug: "FIX_APPLIED_V5"
         };
       });
 
-      // Filter by customerId if provided
-      if (customerId) {
-        invoices = invoices.filter((invoice: any) => invoice.customerId === customerId);
+      // If user is a customer, always filter by their customer profile(s)
+      if (user && user.role === 'customer') {
+        const customersData = readCustomersData();
+        let linkedCustomers = customersData.customers.filter((c: any) => String(c.userId) === String(user.id));
+        if (linkedCustomers.length === 0 && user.email) {
+          linkedCustomers = customersData.customers.filter((c: any) => c.email === user.email);
+        }
+        
+        const customerIds = linkedCustomers.map((c: any) => String(c.id));
+        console.log('Found Customer IDs for user:', customerIds);
+        
+        if (customerIds.length > 0) {
+          invoices = invoices.filter((invoice: any) => customerIds.includes(String(invoice.customerId)));
+        } else {
+          invoices = [];
+        }
+      } 
+      // Admin/Other roles can filter by customerId if provided
+      else if (customerId) {
+        invoices = invoices.filter((invoice: any) => String(invoice.customerId) === String(customerId));
       }
 
+      console.log('Returning invoices count:', invoices.length);
       res.json({ success: true, data: invoices });
     } catch (error) {
+      console.error('Invoice fetch error:', error);
       res.status(500).json({ success: false, message: "Failed to fetch invoices" });
     }
   });
