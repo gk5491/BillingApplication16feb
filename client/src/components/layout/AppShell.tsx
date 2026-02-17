@@ -281,7 +281,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <DropdownMenuContent className="w-56" align="start" side="top">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setLocation(isCustomer ? "/customer/profile" : "/settings")}>
+              <DropdownMenuItem onClick={() => setLocation(isCustomer ? "/customer/settings/profile" : "/settings")}>
                 <UserCog className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>

@@ -1,34 +1,55 @@
-
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import AppShell from "@/components/layout/AppShell";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-
-import { CustomerForm, CustomerFormValues } from "@/modules/sales/components/CustomerForm";
+import { 
+  User, 
+  ChevronDown, 
+  Receipt, 
+  CreditCard, 
+  FileCheck, 
+  Package, 
+  Truck, 
+  Wallet, 
+  BadgeIndianRupee,
+  X,
+  Copy,
+  UserMinus,
+  UserCheck,
+  Trash2
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { format } from "date-fns";
 
 export default function CustomerProfilePage() {
     const { user, token } = useAuthStore();
     const { toast } = useToast();
-    const [isLoading, setIsLoading] = useState(false);
     const [isFetchLoading, setIsFetchLoading] = useState(true);
-    const [profileData, setProfileData] = useState<Partial<CustomerFormValues>>({});
-
+    const [customer, setCustomer] = useState<any>(null);
     const [activeTab, setActiveTab] = useState("overview");
 
+    const [comments, setComments] = useState<any[]>([]);
     const [transactions, setTransactions] = useState<any[]>([]);
     const [mails, setMails] = useState<any[]>([]);
     const [statementTransactions, setStatementTransactions] = useState<any[]>([]);
 
     useEffect(() => {
-        // Fetch existing profile if available
         const fetchProfile = async () => {
             try {
                 const res = await fetch("/api/flow/profile", {
@@ -37,13 +58,14 @@ export default function CustomerProfilePage() {
                 if (res.ok) {
                     const data = await res.json();
                     if (data.data) {
-                        setProfileData(data.data);
+                        setCustomer(data.data);
                         
                         // Fetch related data for tabs
-                        const [txRes, mailRes, invRes] = await Promise.all([
+                        const [txRes, mailRes, invRes, commentsRes] = await Promise.all([
                             fetch(`/api/customers/${data.data.id}/transactions`),
                             fetch(`/api/customers/${data.data.id}/mails`),
-                            fetch("/api/invoices")
+                            fetch("/api/invoices"),
+                            fetch(`/api/customers/${data.data.id}/comments`)
                         ]);
                         
                         if (txRes.ok) {
@@ -61,6 +83,11 @@ export default function CustomerProfilePage() {
                             const filteredInvoices = (invData.data || []).filter((inv: any) => inv.customerId === data.data.id);
                             setStatementTransactions(filteredInvoices);
                         }
+
+                        if (commentsRes.ok) {
+                            const commentsData = await commentsRes.json();
+                            setComments(commentsData.data || []);
+                        }
                     }
                 }
             } catch (error) {
@@ -74,159 +101,192 @@ export default function CustomerProfilePage() {
         else setIsFetchLoading(false);
     }, [token]);
 
+    const formatAddress = (address: any) => {
+        if (!address) return ['-'];
+        const parts = [address.street, address.city, address.state, address.country, address.pincode].filter(Boolean);
+        return parts.length > 0 ? parts : ['-'];
+    };
 
-    const onSubmit = async (data: CustomerFormValues) => {
-        setIsLoading(true);
-        try {
-            const res = await fetch("/api/flow/profile", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
-            });
-
-            const result = await res.json();
-            if (!res.ok) throw new Error(result.message || "Failed to update profile");
-
-            toast({
-                title: "Success",
-                description: "Profile updated successfully"
-            });
-        } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Error",
-                description: error.message
-            });
-        } finally {
-            setIsLoading(false);
-        }
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            minimumFractionDigits: 2
+        }).format(amount);
     };
 
     if (isFetchLoading) {
         return <div className="container mx-auto py-10 text-center">Loading profile...</div>;
     }
 
+    if (!customer) {
+        return <div className="container mx-auto py-10 text-center">Profile not found.</div>;
+    }
+
     return (
-        <div className="container mx-auto py-6">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h1 className="text-3xl font-bold font-display text-slate-900 tracking-tight">My Profile</h1>
-                        <p className="text-slate-500 font-display">Manage your personal and business details</p>
-                    </div>
-                    <TabsList className="bg-slate-100/50 border border-slate-200">
-                        <TabsTrigger value="overview" className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold font-display text-xs uppercase tracking-wider">Overview</TabsTrigger>
-                        <TabsTrigger value="comments" className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold font-display text-xs uppercase tracking-wider">Comments</TabsTrigger>
-                        <TabsTrigger value="transactions" className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold font-display text-xs uppercase tracking-wider">Transactions</TabsTrigger>
-                        <TabsTrigger value="mails" className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold font-display text-xs uppercase tracking-wider">Mails</TabsTrigger>
-                        <TabsTrigger value="statement" className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-bold font-display text-xs uppercase tracking-wider">Statement</TabsTrigger>
+        <div className="h-full flex flex-col bg-white dark:bg-slate-900">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-sidebar-accent/5">
+                <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-semibold text-sidebar font-display truncate">{customer.name}</h2>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm">
+                        Edit
+                    </Button>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button className="bg-sidebar hover:bg-sidebar/90 text-white gap-1.5 h-9 font-display shadow-sm" size="sm">
+                                New Transaction
+                                <ChevronDown className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56">
+                            <DropdownMenuLabel className="text-xs text-slate-500">SALES</DropdownMenuLabel>
+                            <DropdownMenuItem><Receipt className="mr-2 h-4 w-4" /> Invoice</DropdownMenuItem>
+                            <DropdownMenuItem><CreditCard className="mr-2 h-4 w-4" /> Customer Payment</DropdownMenuItem>
+                            <DropdownMenuItem><FileCheck className="mr-2 h-4 w-4" /> Quote</DropdownMenuItem>
+                            <DropdownMenuItem><Package className="mr-2 h-4 w-4" /> Sales Order</DropdownMenuItem>
+                            <DropdownMenuItem><Truck className="mr-2 h-4 w-4" /> Delivery Challan</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem><Wallet className="mr-2 h-4 w-4" /> Expense</DropdownMenuItem>
+                            <DropdownMenuItem><BadgeIndianRupee className="mr-2 h-4 w-4" /> Credit Note</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </div>
+
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                <div className="flex items-center px-6 border-b border-slate-200 bg-white flex-shrink-0">
+                    <TabsList className="h-auto p-0 bg-transparent gap-8">
+                        {["overview", "comments", "transactions", "mails", "statement"].map((tab) => (
+                            <TabsTrigger
+                                key={tab}
+                                value={tab}
+                                className="rounded-none border-b-2 border-transparent data-[state=active]:border-sidebar data-[state=active]:text-sidebar data-[state=active]:bg-transparent data-[state=active]:shadow-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-2 py-3 bg-transparent hover:bg-transparent transition-none font-medium font-display capitalize"
+                            >
+                                {tab}
+                            </TabsTrigger>
+                        ))}
                     </TabsList>
                 </div>
 
-                <TabsContent value="overview">
-                    <Card className="max-w-4xl border-slate-200 shadow-sm">
-                        <CardHeader className="bg-slate-50/50 border-b">
-                            <CardTitle className="text-lg font-bold">Personal Details</CardTitle>
-                            <CardDescription>Update your contact and business information</CardDescription>
-                        </CardHeader>
-                        <CardContent className="pt-6">
-                            <CustomerForm
-                                initialData={profileData}
-                                onSubmit={onSubmit}
-                                isLoading={isLoading}
-                            />
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-                
-                <TabsContent value="comments">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-bold font-display">Comments</h3>
+                <div className="flex-1 overflow-y-auto">
+                    <TabsContent value="overview" className="m-0 p-0">
+                        <div className="flex h-full">
+                            <div className="w-72 border-r border-slate-200 p-6">
+                                <div className="space-y-6">
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-slate-900">{customer.name}</h3>
+                                        <p className="text-sm text-sidebar font-medium mt-1">{customer.email}</p>
+                                    </div>
+                                    <Collapsible defaultOpen>
+                                        <CollapsibleTrigger className="flex items-center justify-between w-full text-[11px] font-bold text-sidebar/60 uppercase tracking-widest">
+                                            ADDRESS
+                                            <ChevronDown className="h-3.5 w-3.5" />
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent className="mt-4 space-y-4">
+                                            <div>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Billing Address</p>
+                                                <div className="text-sm">{formatAddress(customer.billingAddress).map((l:any, i:any) => <p key={i}>{l}</p>)}</div>
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Shipping Address</p>
+                                                <div className="text-sm">{formatAddress(customer.shippingAddress).map((l:any, i:any) => <p key={i}>{l}</p>)}</div>
+                                            </div>
+                                        </CollapsibleContent>
+                                    </Collapsible>
+                                </div>
+                            </div>
+                            <div className="flex-1 p-6">
+                                <div className="max-w-4xl">
+                                    <div className="mb-8">
+                                        <h4 className="text-lg font-semibold mb-4 text-sidebar">Receivables</h4>
+                                        <div className="border border-slate-200 rounded-lg overflow-hidden">
+                                            <table className="w-full text-sm">
+                                                <thead className="bg-slate-50">
+                                                    <tr className="text-left border-b border-slate-200">
+                                                        <th className="px-4 py-2.5 text-[11px] font-bold uppercase">CURRENCY</th>
+                                                        <th className="px-4 py-2.5 text-right text-[11px] font-bold uppercase">OUTSTANDING RECEIVABLES</th>
+                                                        <th className="px-4 py-2.5 text-right text-[11px] font-bold uppercase">UNUSED CREDITS</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td className="px-4 py-3 font-medium">INR- Indian Rupee</td>
+                                                        <td className="px-4 py-3 text-right font-semibold">{formatCurrency(customer.outstandingReceivables || 0)}</td>
+                                                        <td className="px-4 py-3 text-right font-semibold text-green-600">{formatCurrency(customer.unusedCredits || 0)}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </TabsContent>
+
+                    <TabsContent value="comments" className="m-0 p-6">
                         <Card className="border-slate-200 shadow-sm">
                             <CardContent className="pt-6">
                                 <div className="space-y-4">
-                                    <Textarea 
-                                        placeholder="Add a comment..." 
-                                        className="min-h-[100px] bg-slate-50 border-slate-200 focus:border-blue-400"
-                                    />
+                                    <Textarea placeholder="Add a comment..." className="min-h-[100px]" />
                                     <div className="flex justify-end">
-                                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white font-bold font-display">
-                                            Add Comment
-                                        </Button>
+                                        <Button size="sm">Add Comment</Button>
                                     </div>
                                     <div className="border-t border-slate-100 pt-4">
-                                        <p className="text-slate-500 py-6 text-center italic">No comments available for your account.</p>
+                                        {comments.length === 0 ? (
+                                            <p className="text-slate-500 py-6 text-center italic">No comments available.</p>
+                                        ) : (
+                                            comments.map((c: any) => (
+                                                <div key={c.id} className="py-3 border-b border-slate-50 last:border-0">
+                                                    <p className="text-sm text-slate-700">{c.text}</p>
+                                                    <p className="text-[10px] text-slate-400 mt-1">{format(new Date(c.createdAt), "MMM d, yyyy h:mm a")} by {c.author}</p>
+                                                </div>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
-                    </div>
-                </TabsContent>
+                    </TabsContent>
 
-                <TabsContent value="transactions">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-bold font-display">Transaction History</h3>
-                        </div>
-                        <Card className="border-slate-200 shadow-sm">
-                            <CardContent className="p-0">
-                                <Table>
-                                    <TableHeader className="bg-slate-50">
-                                        <TableRow>
-                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider">Date</TableHead>
-                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider">Type</TableHead>
-                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider">Number</TableHead>
-                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider text-right">Amount</TableHead>
-                                            <TableHead className="font-bold text-[11px] uppercase tracking-wider text-right">Status</TableHead>
+                    <TabsContent value="transactions" className="m-0 p-6">
+                        <Table>
+                            <TableHeader className="bg-slate-50">
+                                <TableRow>
+                                    <TableHead className="font-bold">Date</TableHead>
+                                    <TableHead className="font-bold">Number</TableHead>
+                                    <TableHead className="font-bold text-right">Amount</TableHead>
+                                    <TableHead className="font-bold text-right">Status</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {transactions.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="text-center py-20 text-slate-400 italic">No transactions found.</TableCell>
+                                    </TableRow>
+                                ) : (
+                                    transactions.map((tx: any) => (
+                                        <TableRow key={tx.id}>
+                                            <TableCell>{format(new Date(tx.date), "MMM d, yyyy")}</TableCell>
+                                            <TableCell>{tx.invoiceNumber || tx.number}</TableCell>
+                                            <TableCell className="text-right">{formatCurrency(tx.total || tx.amount)}</TableCell>
+                                            <TableCell className="text-right">{tx.status}</TableCell>
                                         </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell colSpan={5} className="text-center py-20 text-slate-400 font-display italic">
-                                                Transaction history will be displayed here.
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TabsContent>
 
-                <TabsContent value="mails">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-bold font-display">Sent Mails</h3>
-                        </div>
-                        <Card className="border-slate-200 shadow-sm">
-                            <CardContent className="pt-6">
-                                <p className="text-slate-500 py-10 text-center italic">No mail history found.</p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
+                    <TabsContent value="mails" className="m-0 p-6 text-center text-slate-500 italic">
+                        {mails.length === 0 ? "No mail history found." : "Mail history content here."}
+                    </TabsContent>
 
-                <TabsContent value="statement">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-bold font-display">Account Statement</h3>
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="sm" className="font-bold font-display">Download PDF</Button>
-                                <Button variant="outline" size="sm" className="font-bold font-display">Print</Button>
-                            </div>
-                        </div>
-                        <Card className="border-slate-200 shadow-sm">
-                            <CardContent className="pt-6">
-                                <p className="text-slate-500 py-10 text-center italic font-display">Your account statement will be generated here.</p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
+                    <TabsContent value="statement" className="m-0 p-6 text-center text-slate-500 italic">
+                        Account statement will be generated here.
+                    </TabsContent>
+                </div>
             </Tabs>
         </div>
     );

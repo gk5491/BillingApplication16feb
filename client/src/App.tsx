@@ -72,6 +72,7 @@ import LoginPage from "@/pages/login";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import CustomerDashboard from "@/pages/customer-dashboard";
 import CustomerProfilePage from "@/pages/customer-profile";
+import CustomerSettingsProfilePage from "@/pages/customer-settings-profile";
 import RequestItemsPage from "@/pages/customer-request-items";
 import CustomerQuotesPage from "@/pages/customer-quotes";
 import CustomerInvoicesPage from "@/pages/customer-invoices";
@@ -91,6 +92,7 @@ function Router() {
               {/* Customer Routes */}
               <Route path="/customer-dashboard" component={CustomerDashboard} />
               <Route path="/customer/profile" component={CustomerProfilePage} />
+              <Route path="/customer/settings/profile" component={CustomerSettingsProfilePage} />
               <Route path="/customer/request" component={RequestItemsPage} />
               <Route path="/customer/quotes" component={CustomerQuotesPage} />
               <Route path="/customer/invoices" component={CustomerInvoicesPage} />
