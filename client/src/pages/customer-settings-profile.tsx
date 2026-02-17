@@ -105,6 +105,36 @@ export default function CustomerSettingsProfilePage() {
                                 isLoading={isLoading}
                                 isEdit={true}
                             />
+
+                            <div className="mt-8 pt-8 border-t border-slate-100">
+                                <h3 className="text-sm font-bold text-slate-900 mb-4 uppercase tracking-wider">Security</h3>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        const newPassword = prompt("Enter new password:");
+                                        if (newPassword) {
+                                            fetch("/api/auth/reset-password", {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                    Authorization: `Bearer ${token}`
+                                                },
+                                                body: JSON.stringify({ password: newPassword })
+                                            })
+                                            .then(res => res.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    alert("Password updated successfully");
+                                                } else {
+                                                    alert(data.message || "Failed to update password");
+                                                }
+                                            });
+                                        }
+                                    }}
+                                >
+                                    Change Password
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>

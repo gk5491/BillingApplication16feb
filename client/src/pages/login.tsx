@@ -97,6 +97,32 @@ export default function LoginPage() {
                             {isLoading ? "Signing in..." : "Sign In"}
                         </Button>
                     </form>
+                    <div className="mt-4 text-center">
+                        <Button
+                            variant="link"
+                            className="text-sm text-sidebar font-medium"
+                            onClick={() => {
+                                const username = prompt("Enter your username to reset password:");
+                                if (username) {
+                                    fetch("/api/auth/forgot-password", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ username })
+                                    })
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.success) {
+                                            alert("Temporary password sent to your email (check console logs in dev)");
+                                        } else {
+                                            alert(data.message || "Failed to reset password");
+                                        }
+                                    });
+                                }
+                            }}
+                        >
+                            Forgot Password?
+                        </Button>
+                    </div>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-2 text-center text-sm text-slate-600">
                     <div>Default Credentials:</div>

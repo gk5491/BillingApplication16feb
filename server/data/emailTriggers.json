@@ -164,6 +164,17 @@
       "customBody": "<p>Hi Mr. Ganesh K,</p><p>Your account has been successfully created.</p>",
       "sendMode": "immediate",
       "createdAt": "2026-02-11T05:41:33.152Z"
+    },
+    {
+      "id": "58aa2dff-f10b-41ae-9891-40ca07e03ef5",
+      "customerId": "4",
+      "recipients": [
+        "ganesh@gmail.com"
+      ],
+      "customSubject": "Account Updated - Cybaem Tech",
+      "customBody": "<p>Hi Ganesh,</p><p>Your customer profile has been updated.</p>",
+      "sendMode": "immediate",
+      "createdAt": "2026-02-17T06:29:28.963Z"
     }
   ]
 }

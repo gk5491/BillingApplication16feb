@@ -8200,9 +8200,10 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
 
   app.post("/api/flow/profile", (req: Request, res: Response) => {
     try {
-      const customerId = req.headers['x-customer-id'] || "1";
+      const { id, name } = req.body;
+      const customerId = req.headers['x-customer-id'] || id || "1";
       const data = readCustomersData();
-      const index = data.customers.findIndex((c: any) => c.id === String(customerId));
+      const index = data.customers.findIndex((c: any) => String(c.id) === String(customerId) || String(c.userId) === String(req.user?.id));
       
       if (index === -1) {
         return res.status(404).json({ success: false, message: "Customer not found" });
@@ -8217,11 +8218,62 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
       
       data.customers[index] = updatedCustomer;
       writeCustomersData(data);
+
+      // Also update user name if provided and we have a user session
+      if (name && req.user) {
+        const users = (storage as any).readUsers();
+        const userIndex = users.findIndex((u: any) => u.id === req.user?.id);
+        if (userIndex !== -1) {
+          users[userIndex].name = name;
+          (storage as any).writeUsers(users);
+        }
+      }
       
       res.json({ success: true, data: updatedCustomer });
     } catch (error) {
       console.error("Error updating flow profile:", error);
       res.status(500).json({ success: false, message: "Failed to update profile" });
+    }
+  });
+
+  app.post("/api/auth/forgot-password", async (req: Request, res: Response) => {
+    try {
+      const { username } = req.body;
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+      }
+
+      const tempPassword = Math.random().toString(36).slice(-8);
+      const users = (storage as any).readUsers();
+      const userIndex = users.findIndex((u: any) => u.id === user.id);
+      if (userIndex !== -1) {
+        users[userIndex].password = tempPassword;
+        (storage as any).writeUsers(users);
+      }
+
+      console.log(`[Email] Password reset for ${username}. Temporary password: ${tempPassword}`);
+      res.json({ success: true, message: "Temporary password sent to your email" });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+      const { password } = req.body;
+      const users = (storage as any).readUsers();
+      const userIndex = users.findIndex((u: any) => u.id === req.user?.id);
+      if (userIndex !== -1) {
+        users[userIndex].password = password;
+        (storage as any).writeUsers(users);
+      }
+      res.json({ success: true, message: "Password reset successfully" });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
     }
   });
 

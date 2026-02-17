@@ -25,6 +25,19 @@
       "sentAt": "2026-02-11T05:41:38.168Z",
       "providerMessageId": "mock-1770788498167-31vhszu",
       "providerResponse": "\"250 2.0.0 OK (Mock)\""
+    },
+    {
+      "id": "06169749-935d-4a5c-8db8-d67a04039b4d",
+      "triggerId": "58aa2dff-f10b-41ae-9891-40ca07e03ef5",
+      "toAddresses": "[\"ganesh@gmail.com\"]",
+      "subject": "Account Updated - Cybaem Tech",
+      "status": "sent",
+      "attempts": 0,
+      "createdAt": "2026-02-17T06:29:33.974Z",
+      "updatedAt": "2026-02-17T06:29:33.976Z",
+      "sentAt": "2026-02-17T06:29:33.976Z",
+      "providerMessageId": "mock-1771309773975-9tzh74o",
+      "providerResponse": "\"250 2.0.0 OK (Mock)\""
     }
   ]
 }
