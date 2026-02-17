@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { CustomerForm, CustomerFormValues } from "@/modules/sales/components/CustomerForm";
+import { useLocation } from "wouter";
+import { ChevronLeft } from "lucide-react";
 
 export default function CustomerSettingsProfilePage() {
     const { token } = useAuthStore();
     const { toast } = useToast();
+    const [, setLocation] = useLocation();
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchLoading, setIsFetchLoading] = useState(true);
     const [profileData, setProfileData] = useState<Partial<CustomerFormValues>>({});
@@ -54,6 +57,7 @@ export default function CustomerSettingsProfilePage() {
                 title: "Success",
                 description: "Profile updated successfully"
             });
+            setLocation("/customer/profile");
         } catch (error: any) {
             toast({
                 variant: "destructive",
@@ -70,23 +74,41 @@ export default function CustomerSettingsProfilePage() {
     }
 
     return (
-        <div className="container mx-auto py-6">
-            <div className="mb-6">
-                <h1 className="text-3xl font-bold font-display text-slate-900 tracking-tight">Personal Details</h1>
-                <p className="text-slate-500 font-display">Update your contact and business information</p>
+        <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-900">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white dark:bg-slate-800">
+                <div className="flex items-center gap-4">
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => setLocation("/customer/profile")}
+                        className="text-slate-500 hover:text-sidebar"
+                    >
+                        <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    <div>
+                        <h1 className="text-xl font-bold font-display text-slate-900 dark:text-white tracking-tight">Edit Profile</h1>
+                        <p className="text-xs text-slate-500 font-display uppercase tracking-widest font-bold">Personal Details</p>
+                    </div>
+                </div>
             </div>
-            <Card className="max-w-4xl border-slate-200 shadow-sm">
-                <CardHeader className="bg-slate-50/50 border-b">
-                    <CardTitle className="text-lg font-bold">Edit Profile</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6">
-                    <CustomerForm
-                        initialData={profileData}
-                        onSubmit={onSubmit}
-                        isLoading={isLoading}
-                    />
-                </CardContent>
-            </Card>
+
+            <div className="flex-1 overflow-y-auto p-6">
+                <div className="max-w-5xl mx-auto">
+                    <Card className="border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div className="bg-sidebar-accent/5 px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                            <h3 className="text-sm font-bold text-sidebar uppercase tracking-wider font-display">Customer Information</h3>
+                        </div>
+                        <CardContent className="p-6 bg-white dark:bg-slate-800/50">
+                            <CustomerForm
+                                initialData={profileData}
+                                onSubmit={onSubmit}
+                                isLoading={isLoading}
+                                isEdit={true}
+                            />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         </div>
     );
 }
