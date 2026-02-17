@@ -262,7 +262,59 @@
       "createdAt": "2026-02-17T07:14:00.402Z",
       "enablePortal": false,
       "updatedAt": "2026-02-17T07:36:00.507Z"
+    },
+    {
+      "id": "6",
+      "name": "soham",
+      "email": "lifeinside109@gmail.com",
+      "phone": "9028441589",
+      "address": "near demart, nanded",
+      "companyName": "amazon",
+      "billingAddress": {
+        "street": "near demart",
+        "city": "nanded",
+        "state": "27",
+        "country": "India",
+        "pincode": "431605",
+        "attention": "guruji chowk",
+        "phone": "",
+        "fax": ""
+      },
+      "shippingAddress": {
+        "street": "near demart",
+        "city": "nanded",
+        "state": "27",
+        "country": "India",
+        "pincode": "431605",
+        "attention": "guruji chowk",
+        "phone": "",
+        "fax": ""
+      },
+      "gstin": "29AAAPL1234C1ZV",
+      "placeOfSupply": "27",
+      "customerType": "business",
+      "userId": "4488091f-180c-473f-8704-e749479dfb92",
+      "updatedAt": "2026-02-17T10:11:20.595Z",
+      "createdAt": "2026-02-17T09:36:57.462Z",
+      "displayName": "soham",
+      "salutation": "mr",
+      "firstName": "soham",
+      "lastName": "kale",
+      "workPhone": "9028441589",
+      "mobile": "",
+      "language": "English",
+      "gstTreatment": "registered_composition",
+      "pan": "KCWPK9238K",
+      "taxPreference": "taxable",
+      "exemptionReason": "",
+      "currency": "INR",
+      "openingBalance": "",
+      "paymentTerms": "",
+      "enablePortal": false,
+      "remarks": "",
+      "tags": [],
+      "contactPersons": []
     }
   ],
-  "nextCustomerId": 6
+  "nextCustomerId": 7
 }

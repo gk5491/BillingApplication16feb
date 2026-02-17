@@ -219,6 +219,17 @@
       "customBody": "<p>Hi Ganesh,</p><p>Your customer profile has been updated.</p>",
       "sendMode": "immediate",
       "createdAt": "2026-02-17T07:41:40.563Z"
+    },
+    {
+      "id": "1d62af47-a47f-41d9-b268-14a490ab3662",
+      "customerId": "6",
+      "recipients": [
+        "lifeinside109@gmail.com"
+      ],
+      "customSubject": "Account Updated - Cybaem Tech",
+      "customBody": "<p>Hi soham,</p><p>Your customer profile has been updated.</p>",
+      "sendMode": "immediate",
+      "createdAt": "2026-02-17T10:11:20.600Z"
     }
   ]
 }

@@ -584,7 +584,56 @@
           "link": "/invoices/1771318205236"
         }
       ]
+    },
+    {
+      "id": "20",
+      "quoteNumber": "QT-000020",
+      "customerId": "1",
+      "customerName": "Mr. Sujay Palande",
+      "billingAddress": {
+        "street": "Hinjewadi  pune",
+        "city": "pune",
+        "state": "maharasta ",
+        "country": "India",
+        "pincode": "413104"
+      },
+      "shippingAddress": {
+        "street": "Hinjewadi  pune",
+        "city": "pune",
+        "state": "maharasta ",
+        "country": "India",
+        "pincode": "413104"
+      },
+      "organizationId": "1",
+      "date": "2026-02-17T09:43:32.860Z",
+      "status": "Approved",
+      "items": [
+        {
+          "id": "1",
+          "name": "Laptop",
+          "description": "",
+          "quantity": 2,
+          "rate": 15000,
+          "amount": 30000,
+          "unit": "set"
+        }
+      ],
+      "subTotal": 30000,
+      "total": 30000,
+      "createdAt": "2026-02-17T09:43:32.860Z",
+      "convertedTo": "invoice",
+      "updatedAt": "2026-02-17T09:45:33.414Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-17T09:45:33.414Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00017",
+          "user": "Admin User",
+          "link": "/invoices/1771321533414"
+        }
+      ]
     }
   ],
-  "nextQuoteNumber": 20
+  "nextQuoteNumber": 21
 }

@@ -1,6 +1,69 @@
 {
   "invoices": [
     {
+      "id": "1771321533414",
+      "invoiceNumber": "INV-00017",
+      "referenceNumber": "",
+      "date": "2026-02-17",
+      "dueDate": "2026-03-19",
+      "customerId": "1",
+      "customerName": "Mr. Sujay Palande",
+      "billingAddress": {
+        "street": "Hinjewadi  pune",
+        "city": "pune",
+        "state": "maharasta ",
+        "country": "India",
+        "pincode": "413104"
+      },
+      "shippingAddress": {
+        "street": "Hinjewadi  pune",
+        "city": "pune",
+        "state": "maharasta ",
+        "country": "India",
+        "pincode": "413104"
+      },
+      "paymentTerms": "Net 30",
+      "items": [
+        {
+          "id": "1",
+          "name": "Laptop",
+          "description": "",
+          "quantity": 2,
+          "rate": 15000,
+          "amount": 30000,
+          "unit": "set"
+        }
+      ],
+      "subTotal": 30000,
+      "total": 30000,
+      "amountPaid": 0,
+      "balanceDue": 30000,
+      "status": "Sent",
+      "sourceType": "quote",
+      "sourceId": "20",
+      "sourceNumber": "QT-000020",
+      "createdAt": "2026-02-17T09:45:33.414Z",
+      "updatedAt": "2026-02-17T09:46:33.683Z",
+      "createdBy": "Admin User",
+      "payments": [],
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-17T09:45:33.414Z",
+          "action": "created",
+          "description": "Invoice created from Quote QT-000020",
+          "user": "Admin User"
+        },
+        {
+          "id": "2",
+          "timestamp": "2026-02-17T09:46:33.683Z",
+          "action": "sent",
+          "description": "Invoice has been sent",
+          "user": "Admin User"
+        }
+      ]
+    },
+    {
       "id": "1771318205236",
       "invoiceNumber": "INV-00016",
       "referenceNumber": "",
@@ -1227,5 +1290,5 @@
       ]
     }
   ],
-  "nextInvoiceNumber": 17
+  "nextInvoiceNumber": 18
 }
