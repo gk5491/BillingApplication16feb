@@ -8177,6 +8177,54 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
     }
   });
 
+  // Customer Flow Profile API
+  app.get("/api/flow/profile", (req: Request, res: Response) => {
+    try {
+      // In a real app, we'd get the customer ID from the JWT token
+      // For now, we'll use a hardcoded ID for testing or from a cookie/header if present
+      const customerId = req.headers['x-customer-id'] || "1"; 
+      
+      const data = readCustomersData();
+      const customer = data.customers.find((c: any) => c.id === String(customerId));
+      
+      if (!customer) {
+        return res.status(404).json({ success: false, message: "Customer not found" });
+      }
+      
+      res.json({ success: true, data: customer });
+    } catch (error) {
+      console.error("Error fetching flow profile:", error);
+      res.status(500).json({ success: false, message: "Failed to fetch profile" });
+    }
+  });
+
+  app.post("/api/flow/profile", (req: Request, res: Response) => {
+    try {
+      const customerId = req.headers['x-customer-id'] || "1";
+      const data = readCustomersData();
+      const index = data.customers.findIndex((c: any) => c.id === String(customerId));
+      
+      if (index === -1) {
+        return res.status(404).json({ success: false, message: "Customer not found" });
+      }
+      
+      const updatedCustomer = {
+        ...data.customers[index],
+        ...req.body,
+        id: data.customers[index].id, // Ensure ID doesn't change
+        updatedAt: new Date().toISOString()
+      };
+      
+      data.customers[index] = updatedCustomer;
+      writeCustomersData(data);
+      
+      res.json({ success: true, data: updatedCustomer });
+    } catch (error) {
+      console.error("Error updating flow profile:", error);
+      res.status(500).json({ success: false, message: "Failed to update profile" });
+    }
+  });
+
   // Transporters API Routes
   function readTransporters() {
     ensureDataDir();
