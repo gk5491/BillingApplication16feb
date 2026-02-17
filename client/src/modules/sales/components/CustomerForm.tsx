@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
+import { Loader2 } from "lucide-react";
+
 export const INDIAN_STATES = [
     { code: "01", name: "Jammu and Kashmir" },
     { code: "02", name: "Himachal Pradesh" },
@@ -345,16 +347,16 @@ export function CustomerForm({ initialData, onSubmit, onCancel, isLoading, isAdm
                     </TabsContent>
                 </Tabs>
 
-                <div className="flex justify-end gap-3 pt-4">
-                    {onCancel && (
-                        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
-                            Cancel
+                    <div className="flex justify-end gap-3 pt-4">
+                        {onCancel && (
+                            <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+                                Cancel
+                            </Button>
+                        )}
+                        <Button type="submit" disabled={isLoading} className="bg-sidebar hover:bg-sidebar/90 text-white font-bold font-display px-6">
+                            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : (isEdit ? "Update Profile" : "Save Customer")}
                         </Button>
-                    )}
-                    <Button type="submit" disabled={isLoading}>
-                        {isLoading ? "Saving..." : "Save Customer"}
-                    </Button>
-                </div>
+                    </div>
             </form>
         </Form>
     );
