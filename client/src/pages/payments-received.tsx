@@ -75,6 +75,13 @@ interface JournalEntry {
   credit: number;
 }
 
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  invoiceId?: string;
+  amountApplied?: number;
+}
+
 interface PaymentReceived {
   id: string;
   paymentNumber: string;
@@ -83,7 +90,7 @@ interface PaymentReceived {
   customerId: string;
   customerName: string;
   customerEmail: string;
-  invoices: any[];
+  invoices: Invoice[];
   mode: string;
   depositTo: string;
   amount: number;
@@ -149,7 +156,8 @@ function PaymentDetailPanel({
   onClose,
   onEdit,
   onDelete,
-  onRefund
+  onRefund,
+  onSendReceipt
 }: {
   payment: PaymentReceived;
   branding?: any;
@@ -158,6 +166,7 @@ function PaymentDetailPanel({
   onEdit: () => void;
   onDelete: () => void;
   onRefund: () => void;
+  onSendReceipt: () => void;
 }) {
   const [showPdfView, setShowPdfView] = useState(true);
   const { toast } = useToast();
@@ -233,7 +242,7 @@ function PaymentDetailPanel({
                 <TooltipContent>Send Receipt</TooltipContent>
               </Tooltip>
               <DropdownMenuContent>
-                <DropdownMenuItem>Send via Email</DropdownMenuItem>
+                <DropdownMenuItem onClick={onSendReceipt}>Send via Email</DropdownMenuItem>
                 <DropdownMenuItem>Send via SMS</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -430,6 +439,8 @@ export default function PaymentsReceived() {
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [paymentToDelete, setPaymentToDelete] = useState<string | null>(null);
+  const [sendReceiptDialogOpen, setSendReceiptDialogOpen] = useState(false);
+  const [isSendingReceipt, setIsSendingReceipt] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [branding, setBranding] = useState<any>(null);
   const [sortBy, setSortBy] = useState<{ field: string; order: 'asc' | 'desc' }>({ field: 'date', order: 'desc' });
@@ -530,6 +541,54 @@ export default function PaymentsReceived() {
 
   const handleRefund = () => {
     toast({ title: "Refund", description: "Refund functionality coming soon" });
+  };
+
+  const handleSendReceipt = () => {
+    if (!selectedPayment) return;
+    setSendReceiptDialogOpen(true);
+  };
+
+  const confirmSendReceipt = async () => {
+    if (!selectedPayment) return;
+
+    setIsSendingReceipt(true);
+    try {
+      const response = await fetch(`/api/payments-received/${selectedPayment.id}/send-receipt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Receipt Sent",
+          description: data.message || `Payment receipt has been sent to ${selectedPayment.customerEmail || 'the customer'}`
+        });
+        await fetchPayments(); // Refresh to show activity log
+        // Update selected payment with fresh data
+        const updatedPayment = payments.find(p => p.id === selectedPayment.id);
+        if (updatedPayment) {
+          setSelectedPayment(updatedPayment);
+        }
+      } else {
+        toast({
+          title: "Failed to Send",
+          description: data.message || "Could not send payment receipt",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error sending receipt:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send payment receipt. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSendingReceipt(false);
+      setSendReceiptDialogOpen(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -793,7 +852,7 @@ export default function PaymentsReceived() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {paginatedItems.map((payment) => (
+                        {paginatedItems.map((payment: PaymentReceived) => (
                           <TableRow
                             key={payment.id}
                             onClick={() => handlePaymentClick(payment)}
@@ -818,7 +877,7 @@ export default function PaymentsReceived() {
                             <TableCell className="py-4 text-sm font-semibold text-sidebar hover:text-primary transition-colors font-display cursor-pointer">{payment.customerName}</TableCell>
                             <TableCell className="py-4 text-sm">
                               {payment.invoices?.length > 0
-                                ? payment.invoices.map((inv: any) => inv.invoiceNumber).join(', ')
+                                ? payment.invoices.map(inv => inv.invoiceNumber).join(', ')
                                 : '-'
                               }
                             </TableCell>
@@ -861,6 +920,7 @@ export default function PaymentsReceived() {
                   onEdit={handleEditPayment}
                   onDelete={() => handleDelete(selectedPayment.id)}
                   onRefund={handleRefund}
+                  onSendReceipt={handleSendReceipt}
                 />
               </div>
             </ResizablePanel>
@@ -880,6 +940,46 @@ export default function PaymentsReceived() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={sendReceiptDialogOpen} onOpenChange={setSendReceiptDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send Payment Receipt</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedPayment ? (
+                <>
+                  Send payment receipt for <strong>{selectedPayment.paymentNumber}</strong> to{' '}
+                  <strong>{selectedPayment.customerEmail || selectedPayment.customerName}</strong>?
+                  {!selectedPayment.customerEmail && (
+                    <div className="mt-2 text-orange-600">
+                      ⚠️ Warning: Customer email not found. Please update customer details.
+                    </div>
+                  )}
+                </>
+              ) : (
+                'Send payment receipt to customer?'
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSendingReceipt}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmSendReceipt}
+              disabled={isSendingReceipt || !selectedPayment?.customerEmail}
+              className="bg-[#002e46] hover:bg-[#001f2f]"
+            >
+              {isSendingReceipt ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Send Receipt'
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

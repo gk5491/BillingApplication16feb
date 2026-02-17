@@ -160,6 +160,61 @@ export function CustomerForm({ initialData, onSubmit, onCancel, isLoading, isAdm
         },
     });
 
+    // Track the last loaded ID to avoid unnecessary resets
+    const lastLoadedId = React.useRef<string | undefined>(undefined);
+
+    // Reset form when initialData changes (important for profile settings)
+    React.useEffect(() => {
+        if (!initialData) return;
+
+        const hasData = Object.keys(initialData).length > 0;
+        const idChanged = initialData.id !== lastLoadedId.current;
+        const isFirstLoad = hasData && lastLoadedId.current === undefined;
+
+        if (idChanged || isFirstLoad) {
+            form.reset({
+                customerType: initialData.customerType || "business",
+                salutation: initialData.salutation || "",
+                firstName: initialData.firstName || "",
+                lastName: initialData.lastName || "",
+                name: initialData.name || "",
+                companyName: initialData.companyName || "",
+                email: initialData.email || "",
+                phone: initialData.phone || "",
+                mobile: initialData.mobile || "",
+                gstin: initialData.gstin || "",
+                gstTreatment: initialData.gstTreatment || "registered_regular",
+                placeOfSupply: initialData.placeOfSupply || "27",
+                pan: initialData.pan || "",
+                taxPreference: initialData.taxPreference || "taxable",
+                exemptionReason: initialData.exemptionReason || "",
+                currency: initialData.currency || "INR",
+                paymentTerms: initialData.paymentTerms || "due_on_receipt",
+                billingAddress: {
+                    street: initialData.billingAddress?.street || "",
+                    city: initialData.billingAddress?.city || "",
+                    state: initialData.billingAddress?.state || "",
+                    country: initialData.billingAddress?.country || "India",
+                    pincode: initialData.billingAddress?.pincode || "",
+                    attention: initialData.billingAddress?.attention || "",
+                    phone: initialData.billingAddress?.phone || "",
+                    fax: initialData.billingAddress?.fax || "",
+                },
+                shippingAddress: {
+                    street: initialData.shippingAddress?.street || initialData.billingAddress?.street || "",
+                    city: initialData.shippingAddress?.city || initialData.billingAddress?.city || "",
+                    state: initialData.shippingAddress?.state || initialData.billingAddress?.state || "",
+                    country: initialData.shippingAddress?.country || initialData.billingAddress?.country || "India",
+                    pincode: initialData.shippingAddress?.pincode || initialData.billingAddress?.pincode || "",
+                    attention: initialData.shippingAddress?.attention || initialData.billingAddress?.attention || "",
+                    phone: initialData.shippingAddress?.phone || initialData.billingAddress?.phone || "",
+                    fax: initialData.shippingAddress?.fax || initialData.billingAddress?.fax || "",
+                },
+            });
+            lastLoadedId.current = initialData.id || 'LOADED';
+        }
+    }, [initialData, form]);
+
     const copyBillingToShipping = () => {
         form.setValue("shippingAddress", form.getValues("billingAddress"));
     };
@@ -420,92 +475,92 @@ export function CustomerForm({ initialData, onSubmit, onCancel, isLoading, isAdm
                                     <FormItem><FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Street</FormLabel><FormControl><Textarea {...field} className="min-h-[80px] border-slate-200" /></FormControl></FormItem>
                                 )} />
                                 <div className="grid grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="billingAddress.city"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">City</FormLabel>
-                                            <FormControl><Input {...field} className="h-10 border-slate-200" /></FormControl>
-                                        </FormItem>
-                                    )}
-                                />
-                                <div className="grid grid-cols-2 gap-2">
                                     <FormField
                                         control={form.control}
-                                        name="billingAddress.state"
+                                        name="billingAddress.city"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">State</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl><SelectTrigger className="h-10 border-slate-200"><SelectValue /></SelectTrigger></FormControl>
-                                                    <SelectContent>{INDIAN_STATES.map(s => <SelectItem key={s.code} value={s.code}>{s.name}</SelectItem>)}</SelectContent>
-                                                </Select>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="billingAddress.pincode"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pincode</FormLabel>
+                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">City</FormLabel>
                                                 <FormControl><Input {...field} className="h-10 border-slate-200" /></FormControl>
                                             </FormItem>
                                         )}
                                     />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="billingAddress.state"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">State</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl><SelectTrigger className="h-10 border-slate-200"><SelectValue /></SelectTrigger></FormControl>
+                                                        <SelectContent>{INDIAN_STATES.map(s => <SelectItem key={s.code} value={s.code}>{s.name}</SelectItem>)}</SelectContent>
+                                                    </Select>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="billingAddress.pincode"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pincode</FormLabel>
+                                                    <FormControl><Input {...field} className="h-10 border-slate-200" /></FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="space-y-4">
-                            <div className="flex items-center border-b border-slate-100 pb-2 h-[36px]">
-                                <h3 className="text-[11px] font-bold uppercase tracking-widest text-sidebar">Shipping Address</h3>
-                            </div>
-                            <FormField control={form.control} name="shippingAddress.attention" render={({ field }) => (
-                                <FormItem><FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Attention</FormLabel><FormControl><Input {...field} className="h-10 border-slate-200" /></FormControl></FormItem>
-                            )} />
-                            <FormField control={form.control} name="shippingAddress.street" render={({ field }) => (
-                                <FormItem><FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Street</FormLabel><FormControl><Textarea {...field} className="min-h-[80px] border-slate-200" /></FormControl></FormItem>
-                            )} />
-                            <div className="grid grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="shippingAddress.city"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">City</FormLabel>
-                                            <FormControl><Input {...field} className="h-10 border-slate-200" /></FormControl>
-                                        </FormItem>
-                                    )}
-                                />
-                                <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-4">
+                                <div className="flex items-center border-b border-slate-100 pb-2 h-[36px]">
+                                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-sidebar">Shipping Address</h3>
+                                </div>
+                                <FormField control={form.control} name="shippingAddress.attention" render={({ field }) => (
+                                    <FormItem><FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Attention</FormLabel><FormControl><Input {...field} className="h-10 border-slate-200" /></FormControl></FormItem>
+                                )} />
+                                <FormField control={form.control} name="shippingAddress.street" render={({ field }) => (
+                                    <FormItem><FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Street</FormLabel><FormControl><Textarea {...field} className="min-h-[80px] border-slate-200" /></FormControl></FormItem>
+                                )} />
+                                <div className="grid grid-cols-2 gap-4">
                                     <FormField
                                         control={form.control}
-                                        name="shippingAddress.state"
+                                        name="shippingAddress.city"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">State</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                    <FormControl><SelectTrigger className="h-10 border-slate-200"><SelectValue /></SelectTrigger></FormControl>
-                                                    <SelectContent>{INDIAN_STATES.map(s => <SelectItem key={s.code} value={s.code}>{s.name}</SelectItem>)}</SelectContent>
-                                                </Select>
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="shippingAddress.pincode"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pincode</FormLabel>
+                                                <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">City</FormLabel>
                                                 <FormControl><Input {...field} className="h-10 border-slate-200" /></FormControl>
                                             </FormItem>
                                         )}
                                     />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <FormField
+                                            control={form.control}
+                                            name="shippingAddress.state"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">State</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                        <FormControl><SelectTrigger className="h-10 border-slate-200"><SelectValue /></SelectTrigger></FormControl>
+                                                        <SelectContent>{INDIAN_STATES.map(s => <SelectItem key={s.code} value={s.code}>{s.name}</SelectItem>)}</SelectContent>
+                                                    </Select>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="shippingAddress.pincode"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pincode</FormLabel>
+                                                    <FormControl><Input {...field} className="h-10 border-slate-200" /></FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
                     </TabsContent>
                 </Tabs>

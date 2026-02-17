@@ -102,6 +102,15 @@ export class EmailDataService {
           bodyHtmlTemplate: '<p>Hi {{contact.name}},</p><p>Please find attached invoice {{transaction.number}} for {{transaction.total_formatted}}.</p><p>Due date: {{transaction.due_date_formatted}}</p><p>Thank you for your business!</p><p>{{organization.name}}</p>',
           bodyTextTemplate: 'Hi {{contact.name}},\n\nPlease find attached invoice {{transaction.number}} for {{transaction.total_formatted}}.\n\nDue date: {{transaction.due_date_formatted}}\n\nThank you for your business!\n\n{{organization.name}}',
           isDefault: true
+        },
+        {
+          id: 'tpl_password_reset',
+          name: 'Password Reset Email',
+          category: 'auth',
+          subjectTemplate: 'Password Reset for {{organization.name}}',
+          bodyHtmlTemplate: '<p>Hi {{name}},</p><p>We received a request to reset your password. Your temporary password is: <strong>{{tempPassword}}</strong></p><p>Please log in and change your password immediately.</p><p>Regards,<br>{{organization.name}}</p>',
+          bodyTextTemplate: 'Hi {{name}},\n\nWe received a request to reset your password. Your temporary password is: {{tempPassword}}\n\nPlease log in and change your password immediately.\n\nRegards,\n{{organization.name}}',
+          isDefault: false
         }
       ];
       data.templates = defaults;

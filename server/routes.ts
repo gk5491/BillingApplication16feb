@@ -1030,6 +1030,31 @@ export async function registerRoutes(
       data.nextCustomerId += 1;
       writeCustomersData(data);
 
+      // Create a user account for the customer if email and password are provided
+      if (newCustomer.email && req.body.password) {
+        try {
+          const existingUser = await storage.getUserByUsername(newCustomer.email);
+          if (!existingUser) {
+            const newUser = await storage.createUser({
+              username: newCustomer.email,
+              password: req.body.password,
+              name: newCustomer.displayName || newCustomer.name,
+              role: 'customer',
+            });
+
+            // Link customer to the new user
+            const customerIndex = data.customers.findIndex(c => c.id === newCustomer.id);
+            if (customerIndex !== -1) {
+              data.customers[customerIndex].userId = newUser.id;
+              writeCustomersData(data);
+              newCustomer.userId = newUser.id;
+            }
+          }
+        } catch (authError) {
+          console.error("Failed to create user account for customer:", authError);
+        }
+      }
+
       // Send Notification Email
       try {
         const orgData = readOrganizationsData();
@@ -3428,7 +3453,7 @@ export async function registerRoutes(
       if (quoteIndex === -1) return res.status(404).json({ success: false, message: 'Quote not found' });
       const quote = quotesData.quotes[quoteIndex];
       const now = new Date().toISOString();
-      
+
       quote.status = 'Approved';
       quote.updatedAt = now;
       if (!quote.activityLogs) quote.activityLogs = [];
@@ -3453,7 +3478,7 @@ export async function registerRoutes(
       if (quoteIndex === -1) return res.status(404).json({ success: false, message: 'Quote not found' });
       const quote = quotesData.quotes[quoteIndex];
       const now = new Date().toISOString();
-      
+
       quote.status = 'Scrapped';
       quote.updatedAt = now;
       if (!quote.activityLogs) quote.activityLogs = [];
@@ -3478,7 +3503,7 @@ export async function registerRoutes(
       if (quoteIndex === -1) return res.status(404).json({ success: false, message: 'Quote not found' });
       const quote = quotesData.quotes[quoteIndex];
       const now = new Date().toISOString();
-      
+
       quote.status = 'Declined';
       quote.updatedAt = now;
       if (!quote.activityLogs) quote.activityLogs = [];
@@ -3589,11 +3614,11 @@ export async function registerRoutes(
       const invoicesData = readInvoicesData();
       const invoiceIndex = invoicesData.invoices.findIndex((inv: any) => inv.id === req.params.id);
       if (invoiceIndex === -1) return res.status(404).json({ success: false, message: "Invoice not found" });
-       const now = new Date().toISOString();
+      const now = new Date().toISOString();
 
       invoicesData.invoices[invoiceIndex].status = "Sent";
-invoicesData.invoices[invoiceIndex].updatedAt = now;
-      
+      invoicesData.invoices[invoiceIndex].updatedAt = now;
+
       if (!invoicesData.invoices[invoiceIndex].activityLogs) {
         invoicesData.invoices[invoiceIndex].activityLogs = [];
       }
@@ -3621,7 +3646,7 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
       // Simulate sending payment link
       const now = new Date().toISOString();
       invoicesData.invoices[invoiceIndex].paymentLinkSentAt = now;
-      
+
       if (!invoicesData.invoices[invoiceIndex].activityLogs) {
         invoicesData.invoices[invoiceIndex].activityLogs = [];
       }
@@ -3633,11 +3658,11 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
         user: req.body.user || 'Admin User'
       });
       writeInvoicesData(invoicesData);
-      
+
       res.json({ success: true, message: "Payment link has been sent to the customer." });
     } catch (error) {
       res.status(500).json({ success: false, message: "Failed to send payment link" });
-     }
+    }
   });
   app.post("/api/invoices/:id/record-payment", (req: Request, res: Response) => {
     try {
@@ -3664,7 +3689,7 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
         invoice.status = 'Partially Paid';
       }
       invoice.updatedAt = now;
-      
+
       if (!invoice.activityLogs) invoice.activityLogs = [];
       invoice.activityLogs.push({
         id: String(invoice.activityLogs.length + 1),
@@ -3677,8 +3702,8 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
       res.json({ success: true, message: "Payment recorded successfully", data: invoice });
     } catch (error) {
       res.status(500).json({ success: false, message: "Failed to record payment" });
-    
-    
+
+
     }
   });
   app.post("/api/quotes/:id/convert-to-sales-order", (req: Request, res: Response) => {
@@ -6855,6 +6880,131 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
     }
   });
 
+  // Send Payment Receipt to Customer
+  app.post("/api/payments-received/:id/send-receipt", async (req: Request, res: Response) => {
+    try {
+      const data = readPaymentsReceivedData();
+      const payment = data.paymentsReceived.find((p: any) => p.id === req.params.id);
+
+      if (!payment) {
+        return res.status(404).json({ success: false, message: "Payment not found" });
+      }
+
+      // Get customer details
+      const customersData = readCustomersData();
+      const customer = customersData.customers.find((c: any) => c.id === payment.customerId);
+
+      if (!customer || !customer.email) {
+        return res.status(400).json({ success: false, message: "Customer email not found" });
+      }
+
+      // Get invoice details if payment is linked to invoices
+      let invoiceDetails = '';
+      if (payment.invoices && payment.invoices.length > 0) {
+        const invoicesData = readInvoicesData();
+        const invoiceNumbers = payment.invoices.map((pi: any) => {
+          const invoice = invoicesData.invoices.find((inv: any) => inv.id === pi.invoiceId);
+          return invoice ? invoice.invoiceNumber : '';
+        }).filter(Boolean).join(', ');
+        invoiceDetails = invoiceNumbers;
+      }
+
+      // Format payment date
+      const paymentDate = new Date(payment.date).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      // Format amount
+      const amountFormatted = `₹${payment.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+
+      // Build email subject and body
+      const emailSubject = `Payment Receipt - ${payment.paymentNumber}`;
+      const emailBody = `
+        <p>Dear ${customer.displayName || customer.name || 'Valued Customer'},</p>
+        
+        <p>Thank you for your payment. Please find the payment details below:</p>
+        
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Payment Number:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payment.paymentNumber}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Payment Date:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${paymentDate}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Amount Paid:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${amountFormatted}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Payment Method:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payment.mode || 'N/A'}</td>
+          </tr>
+          ${payment.referenceNumber ? `
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Reference Number:</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${payment.referenceNumber}</td>
+          </tr>
+          ` : ''}
+          ${invoiceDetails ? `
+          <tr>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;"><strong>Invoice(s):</strong></td>
+            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${invoiceDetails}</td>
+          </tr>
+          ` : ''}
+        </table>
+        
+        ${payment.notes ? `<p><strong>Notes:</strong> ${payment.notes}</p>` : ''}
+        
+        <p>If you have any questions regarding this payment, please don't hesitate to contact us.</p>
+      `;
+
+      // Send email using EmailTriggerService with correct parameters
+      await EmailTriggerService.createTrigger({
+        transactionType: 'payment',
+        transactionId: payment.id,
+        customerId: payment.customerId,
+        recipients: [customer.email],
+        sendMode: 'immediate',
+        customSubject: emailSubject,
+        customBody: emailBody
+      }, { customer, payment });
+
+      // Add activity log to payment
+      if (!payment.activityLogs) {
+        payment.activityLogs = [];
+      }
+
+      payment.activityLogs.push({
+        id: String(payment.activityLogs.length + 1),
+        timestamp: new Date().toISOString(),
+        action: 'receipt_sent',
+        description: `Payment receipt sent to ${customer.email}`,
+        user: 'Admin'
+      });
+
+      // Update payment data
+      const paymentIndex = data.paymentsReceived.findIndex((p: any) => p.id === req.params.id);
+      data.paymentsReceived[paymentIndex] = payment;
+      writePaymentsReceivedData(data);
+
+      res.json({
+        success: true,
+        message: `Payment receipt sent to ${customer.email}`,
+        data: payment
+      });
+    } catch (error) {
+      console.error('Error sending payment receipt:', error);
+      res.status(500).json({
+        success: false,
+        message: "Failed to send payment receipt. Please check email configuration."
+      });
+    }
+  });
+
   // Refund from invoice - creates refund record and updates payment
   app.post("/api/invoices/:id/refund", (req: Request, res: Response) => {
     try {
@@ -8178,19 +8328,20 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
   });
 
   // Customer Flow Profile API
-  app.get("/api/flow/profile", (req: Request, res: Response) => {
+  app.get("/api/flow/profile", authenticate, (req: Request, res: Response) => {
     try {
-      // In a real app, we'd get the customer ID from the JWT token
-      // For now, we'll use a hardcoded ID for testing or from a cookie/header if present
-      const customerId = req.headers['x-customer-id'] || "1"; 
-      
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+
       const data = readCustomersData();
-      const customer = data.customers.find((c: any) => c.id === String(customerId));
-      
+      // Find customer by userId instead of hardcoded ID
+      const customer = data.customers.find((c: any) => String(c.userId) === String(req.user?.id));
+
       if (!customer) {
         return res.status(404).json({ success: false, message: "Customer not found" });
       }
-      
+
       res.json({ success: true, data: customer });
     } catch (error) {
       console.error("Error fetching flow profile:", error);
@@ -8198,24 +8349,27 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
     }
   });
 
-  app.post("/api/flow/profile", (req: Request, res: Response) => {
+  app.post("/api/flow/profile", authenticate, (req: Request, res: Response) => {
     try {
-      const { id, name } = req.body;
-      const customerId = req.headers['x-customer-id'] || id || "1";
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
+      }
+
+      const { name } = req.body;
       const data = readCustomersData();
-      const index = data.customers.findIndex((c: any) => String(c.id) === String(customerId) || String(c.userId) === String(req.user?.id));
-      
+      const index = data.customers.findIndex((c: any) => String(c.userId) === String(req.user?.id));
+
       if (index === -1) {
         return res.status(404).json({ success: false, message: "Customer not found" });
       }
-      
+
       const updatedCustomer = {
         ...data.customers[index],
         ...req.body,
         id: data.customers[index].id, // Ensure ID doesn't change
         updatedAt: new Date().toISOString()
       };
-      
+
       data.customers[index] = updatedCustomer;
       writeCustomersData(data);
 
@@ -8228,7 +8382,7 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
           (storage as any).writeUsers(users);
         }
       }
-      
+
       res.json({ success: true, data: updatedCustomer });
     } catch (error) {
       console.error("Error updating flow profile:", error);
@@ -8247,14 +8401,61 @@ invoicesData.invoices[invoiceIndex].updatedAt = now;
       const tempPassword = Math.random().toString(36).slice(-8);
       const users = (storage as any).readUsers();
       const userIndex = users.findIndex((u: any) => u.id === user.id);
+
       if (userIndex !== -1) {
         users[userIndex].password = tempPassword;
         (storage as any).writeUsers(users);
       }
 
-      console.log(`[Email] Password reset for ${username}. Temporary password: ${tempPassword}`);
-      res.json({ success: true, message: "Temporary password sent to your email" });
+      // Find if there's a customer email to send to
+      const customersData = readCustomersData();
+      const customer = customersData.customers.find((c: any) =>
+        String(c.userId) === String(user.id) || c.email === username || c.name === username
+      );
+
+      const recipientEmail = customer?.email || (username.includes('@') ? username : null);
+
+      if (recipientEmail) {
+        // Import necessary services
+        const { EmailQueue } = await import("./src/services/emailQueue");
+        const { EmailTemplateRenderer } = await import("./src/services/emailTemplateRenderer");
+        const { EmailDataService } = await import("./src/services/emailDataService");
+
+        const content = await EmailTemplateRenderer.render({
+          templateId: 'tpl_password_reset',
+          context: {
+            name: user.name || user.username,
+            tempPassword: tempPassword
+          }
+        });
+
+        // Save audit for tracking
+        const audit = EmailDataService.saveAudit({
+          toAddresses: JSON.stringify([recipientEmail]),
+          subject: content.subject,
+          status: 'queued',
+          attempts: 0
+        });
+
+        await EmailQueue.enqueue({
+          auditId: audit.id,
+          to: [recipientEmail],
+          subject: content.subject,
+          bodyHtml: content.bodyHtml,
+          bodyText: content.bodyText
+        });
+
+        console.log(`[Email] Password reset for ${username} sent to ${recipientEmail}`);
+      } else {
+        console.log(`[Email] Password reset for ${username}. Temporary password (logged only): ${tempPassword}`);
+      }
+
+      res.json({
+        success: true,
+        message: recipientEmail ? "Temporary password sent to your email" : "Temporary password reset (could not find email to send)"
+      });
     } catch (error: any) {
+      console.error("Forgot password error:", error);
       res.status(500).json({ success: false, message: error.message });
     }
   });

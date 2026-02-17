@@ -549,7 +549,7 @@ export default function CustomerEdit() {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-50 h-screen animate-in slide-in-from-right duration-300">
+    <div className="flex-1 flex flex-col bg-slate-50 animate-in slide-in-from-right duration-300">
       <div className="flex items-center justify-between p-4 bg-white border-b border-slate-200">
         <h1 className="text-xl font-bold font-display text-slate-900">Edit Customer</h1>
         <Button

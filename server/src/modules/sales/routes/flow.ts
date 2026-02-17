@@ -29,6 +29,16 @@ export const createFlowRouter = (db: any) => {
         return customer;
     };
 
+    // Helper to find all customers by userId or email
+    const findAllCustomers = (customersData: any, user: any) => {
+        if (!user) return [];
+        let customers = customersData.customers.filter((c: any) => c.userId === user.id);
+        if (customers.length === 0) {
+            customers = customersData.customers.filter((c: any) => c.email === user.email);
+        }
+        return customers;
+    };
+
     // Customer Profile Management
     flowRouter.post('/profile', authenticate, requireRole(UserRole.CUSTOMER), async (req: AuthenticatedRequest, res: Response) => {
         try {
@@ -161,13 +171,14 @@ export const createFlowRouter = (db: any) => {
         try {
             const quotesData = readQuotesData();
             const customersData = readCustomersData();
-            const customer = findCustomer(customersData, req.user);
+            const customers = findAllCustomers(customersData, req.user);
 
-            if (!customer) {
+            if (customers.length === 0) {
                 return res.json({ success: true, data: [] });
             }
 
-            const myQuotes = quotesData.quotes.filter((q: any) => q.customerId === customer.id);
+            const customerIds = customers.map((c: any) => c.id);
+            const myQuotes = quotesData.quotes.filter((q: any) => customerIds.includes(q.customerId));
             res.json({ success: true, data: myQuotes });
         } catch (error) {
             res.status(500).json({ success: false, message: "Failed to fetch quotes" });
@@ -267,14 +278,28 @@ export const createFlowRouter = (db: any) => {
         try {
             const invoicesData = readInvoicesData();
             const customersData = readCustomersData();
-            const customer = findCustomer(customersData, req.user);
+            const customers = findAllCustomers(customersData, req.user);
 
-            if (!customer) {
+            console.log('=== INVOICE ENDPOINT DEBUG ===');
+            console.log('User ID:', req.user?.id);
+            console.log('User Email:', req.user?.email);
+            console.log('Found Customers:', customers.length);
+            console.log('Customer IDs:', customers.map((c: any) => c.id));
+
+            if (customers.length === 0) {
+                console.log('No customers found - returning empty array');
                 return res.json({ success: true, data: [] });
             }
 
-            // Filter invoices for this customer
-            const myInvoices = invoicesData.invoices.filter((inv: any) => inv.customerId === customer.id);
+            const customerIds = customers.map((c: any) => c.id);
+            // Filter invoices for ANY of these customers
+            const myInvoices = invoicesData.invoices.filter((inv: any) => customerIds.includes(inv.customerId));
+
+            console.log('Total invoices in system:', invoicesData.invoices.length);
+            console.log('Invoices for these customers:', myInvoices.length);
+            console.log('Invoice IDs:', myInvoices.map((inv: any) => inv.invoiceNumber));
+            console.log('=== END DEBUG ===');
+
             res.json({ success: true, data: myInvoices });
         } catch (error) {
             res.status(500).json({ success: false, message: "Failed to fetch invoices" });
@@ -314,14 +339,15 @@ export const createFlowRouter = (db: any) => {
         try {
             const paymentsData = readPaymentsReceivedData();
             const customersData = readCustomersData();
-            const customer = findCustomer(customersData, req.user);
+            const customers = findAllCustomers(customersData, req.user);
 
-            if (!customer) {
+            if (customers.length === 0) {
                 return res.json({ success: true, data: [] });
             }
 
-            // Filter payments for this customer
-            const myReceipts = paymentsData.paymentsReceived.filter((pr: any) => pr.customerId === customer.id);
+            const customerIds = customers.map((c: any) => c.id);
+            // Filter payments for ANY of these customers
+            const myReceipts = paymentsData.paymentsReceived.filter((pr: any) => customerIds.includes(pr.customerId));
             res.json({ success: true, data: myReceipts });
         } catch (error) {
             res.status(500).json({ success: false, message: "Failed to fetch receipts" });
@@ -332,6 +358,7 @@ export const createFlowRouter = (db: any) => {
     flowRouter.post('/invoices/:id/pay', authenticate, requireRole(UserRole.CUSTOMER), async (req: AuthenticatedRequest, res: Response) => {
         try {
             const { id } = req.params;
+            const { amount } = req.body;
             const invoicesData = readInvoicesData();
             const customersData = readCustomersData();
             const customer = findCustomer(customersData, req.user);
@@ -351,12 +378,56 @@ export const createFlowRouter = (db: any) => {
                 return res.status(403).json({ success: false, message: "Unauthorized" });
             }
 
-            invoicesData.invoices[invoiceIndex].status = "Paid";
-            invoicesData.invoices[invoiceIndex].balanceDue = 0;
+            // Record the payment
+            const paymentAmount = Number(amount) || invoice.balanceDue || invoice.total;
+            const currentAmountPaid = invoice.amountPaid || 0;
+            const newAmountPaid = currentAmountPaid + paymentAmount;
+            const newBalanceDue = (invoice.total || 0) - newAmountPaid;
+
+            // Add payment to payments array
+            if (!invoicesData.invoices[invoiceIndex].payments) {
+                invoicesData.invoices[invoiceIndex].payments = [];
+            }
+
+            invoicesData.invoices[invoiceIndex].payments.push({
+                id: String(Date.now()),
+                date: new Date().toISOString(),
+                amount: paymentAmount,
+                paymentMode: "online",
+                reference: "",
+                notes: "Payment recorded by customer"
+            });
+
+            // Update invoice
+            invoicesData.invoices[invoiceIndex].amountPaid = newAmountPaid;
+            invoicesData.invoices[invoiceIndex].balanceDue = newBalanceDue;
+
+            // Update status based on balance
+            if (newBalanceDue <= 0) {
+                invoicesData.invoices[invoiceIndex].status = "Paid";
+                invoicesData.invoices[invoiceIndex].balanceDue = 0;
+            } else if (newAmountPaid > 0) {
+                invoicesData.invoices[invoiceIndex].status = "Partially Paid";
+            }
+
+            // Add activity log
+            if (!invoicesData.invoices[invoiceIndex].activityLogs) {
+                invoicesData.invoices[invoiceIndex].activityLogs = [];
+            }
+
+            invoicesData.invoices[invoiceIndex].activityLogs.push({
+                id: String(invoicesData.invoices[invoiceIndex].activityLogs.length + 1),
+                timestamp: new Date().toISOString(),
+                action: "payment_recorded",
+                description: `Payment of ₹${paymentAmount.toLocaleString('en-IN')} recorded`,
+                user: customer.name || customer.email || "Customer"
+            });
+
             writeInvoicesData(invoicesData);
 
             res.json({ success: true, message: "Payment successful", data: invoicesData.invoices[invoiceIndex] });
         } catch (error) {
+            console.error("Payment error:", error);
             res.status(500).json({ success: false, message: "Payment failed" });
         }
     });

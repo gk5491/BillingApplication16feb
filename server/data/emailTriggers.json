@@ -175,6 +175,50 @@
       "customBody": "<p>Hi Ganesh,</p><p>Your customer profile has been updated.</p>",
       "sendMode": "immediate",
       "createdAt": "2026-02-17T06:29:28.963Z"
+    },
+    {
+      "id": "5b3247a6-2679-4bfa-b613-2332dbcc1b05",
+      "customerId": "5",
+      "recipients": [
+        "ganeshrk5491@gmail.com"
+      ],
+      "customSubject": "Welcome to Cybaem Tech",
+      "customBody": "<p>Hi Mr. Soham kale,</p><p>Your account has been successfully created.</p>",
+      "sendMode": "immediate",
+      "createdAt": "2026-02-17T07:14:00.406Z"
+    },
+    {
+      "id": "3aa66933-a84d-43ee-ba2b-1c80091e7a1b",
+      "customerId": "5",
+      "recipients": [
+        "ganeshrk5491@gmail.com"
+      ],
+      "customSubject": "Account Updated - Cybaem Tech",
+      "customBody": "<p>Hi Mr. Soham kale,</p><p>Your customer profile has been updated.</p>",
+      "sendMode": "immediate",
+      "createdAt": "2026-02-17T07:16:22.237Z"
+    },
+    {
+      "id": "83ce5bd8-c9b9-44e0-8f17-967439799482",
+      "customerId": "5",
+      "recipients": [
+        "ganeshrk5491@gmail.com"
+      ],
+      "customSubject": "Account Updated - Cybaem Tech",
+      "customBody": "<p>Hi Mr. Soham kale,</p><p>Your customer profile has been updated.</p>",
+      "sendMode": "immediate",
+      "createdAt": "2026-02-17T07:36:00.512Z"
+    },
+    {
+      "id": "ac35c3ae-b8b1-4351-8ea9-3cf0fa3faafb",
+      "customerId": "4",
+      "recipients": [
+        "ganeshkale5491@gmail.com"
+      ],
+      "customSubject": "Account Updated - Cybaem Tech",
+      "customBody": "<p>Hi Ganesh,</p><p>Your customer profile has been updated.</p>",
+      "sendMode": "immediate",
+      "createdAt": "2026-02-17T07:41:40.563Z"
     }
   ]
 }

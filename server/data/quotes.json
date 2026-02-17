@@ -462,7 +462,129 @@
       "subTotal": 36000,
       "total": 36000,
       "createdAt": "2026-02-16T12:18:23.929Z"
+    },
+    {
+      "id": "18",
+      "quoteNumber": "QT-000018",
+      "customerId": "2",
+      "customerName": "Mr. Ganesh K",
+      "billingAddress": {
+        "street": "Guruji chowwk, near demart",
+        "city": "Nanded",
+        "state": "MH",
+        "country": "India",
+        "pincode": "431892"
+      },
+      "shippingAddress": {
+        "street": "Guruji chowwk, near demart",
+        "city": "Nanded",
+        "state": "MH",
+        "country": "India",
+        "pincode": "431892"
+      },
+      "organizationId": "1",
+      "date": "2026-02-17T07:57:48.745Z",
+      "status": "Approved",
+      "items": [
+        {
+          "id": "1",
+          "name": "Laptop",
+          "description": "",
+          "quantity": 1,
+          "rate": 15000,
+          "amount": 15000,
+          "unit": "set"
+        },
+        {
+          "id": "2",
+          "name": "digital bharat ",
+          "description": "",
+          "quantity": 5,
+          "rate": 12000,
+          "amount": 60000,
+          "unit": "pcs"
+        }
+      ],
+      "subTotal": 75000,
+      "total": 75000,
+      "createdAt": "2026-02-17T07:57:48.745Z",
+      "convertedTo": "invoice",
+      "updatedAt": "2026-02-17T07:58:39.660Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-17T07:58:39.660Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00015",
+          "user": "Admin User",
+          "link": "/invoices/1771315119660"
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "quoteNumber": "QT-000019",
+      "customerId": "2",
+      "customerName": "Mr. Ganesh K",
+      "billingAddress": {
+        "street": "Guruji chowwk, near demart",
+        "city": "Nanded",
+        "state": "MH",
+        "country": "India",
+        "pincode": "431892",
+        "attention": "",
+        "phone": "",
+        "fax": ""
+      },
+      "shippingAddress": {
+        "street": "Guruji chowwk, near demart",
+        "city": "Nanded",
+        "state": "MH",
+        "country": "India",
+        "pincode": "431892",
+        "attention": "",
+        "phone": "",
+        "fax": ""
+      },
+      "organizationId": "1",
+      "date": "2026-02-17T08:49:31.628Z",
+      "status": "Approved",
+      "items": [
+        {
+          "id": "1",
+          "name": "Laptop",
+          "description": "",
+          "quantity": 2,
+          "rate": 15000,
+          "amount": 30000,
+          "unit": "set"
+        },
+        {
+          "id": "2",
+          "name": "digital bharat ",
+          "description": "",
+          "quantity": 1,
+          "rate": 12000,
+          "amount": 12000,
+          "unit": "pcs"
+        }
+      ],
+      "subTotal": 42000,
+      "total": 42000,
+      "createdAt": "2026-02-17T08:49:31.628Z",
+      "convertedTo": "invoice",
+      "updatedAt": "2026-02-17T08:50:05.236Z",
+      "activityLogs": [
+        {
+          "id": "1",
+          "timestamp": "2026-02-17T08:50:05.236Z",
+          "action": "converted",
+          "description": "Converted to Invoice INV-00016",
+          "user": "Admin User",
+          "link": "/invoices/1771318205236"
+        }
+      ]
     }
   ],
-  "nextQuoteNumber": 18
+  "nextQuoteNumber": 20
 }

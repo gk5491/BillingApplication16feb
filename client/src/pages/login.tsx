@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useAuthStore } from "@/store/authStore";
@@ -7,6 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -15,6 +23,9 @@ export default function LoginPage() {
     const [, setLocation] = useLocation();
     const { login } = useAuthStore();
     const { toast } = useToast();
+    const [forgotUsername, setForgotUsername] = useState("");
+    const [isForgotLoading, setIsForgotLoading] = useState(false);
+    const [isForgotOpen, setIsForgotOpen] = useState(false);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -98,30 +109,81 @@ export default function LoginPage() {
                         </Button>
                     </form>
                     <div className="mt-4 text-center">
-                        <Button
-                            variant="link"
-                            className="text-sm text-sidebar font-medium"
-                            onClick={() => {
-                                const username = prompt("Enter your username to reset password:");
-                                if (username) {
-                                    fetch("/api/auth/forgot-password", {
-                                        method: "POST",
-                                        headers: { "Content-Type": "application/json" },
-                                        body: JSON.stringify({ username })
-                                    })
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        if (data.success) {
-                                            alert("Temporary password sent to your email (check console logs in dev)");
-                                        } else {
-                                            alert(data.message || "Failed to reset password");
-                                        }
-                                    });
-                                }
-                            }}
-                        >
-                            Forgot Password?
-                        </Button>
+                        <Dialog open={isForgotOpen} onOpenChange={setIsForgotOpen}>
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant="link"
+                                    className="text-sm text-sidebar font-medium"
+                                >
+                                    Forgot Password?
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Reset Password</DialogTitle>
+                                    <DialogDescription>
+                                        Enter your username or email address and we'll send you a temporary password.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4 py-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="forgot-username">Username / Email</Label>
+                                        <Input
+                                            id="forgot-username"
+                                            placeholder="Enter your username or email"
+                                            value={forgotUsername}
+                                            onChange={(e) => setForgotUsername(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setIsForgotOpen(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        onClick={async () => {
+                                            if (!forgotUsername) return;
+                                            setIsForgotLoading(true);
+                                            try {
+                                                const response = await fetch("/api/auth/forgot-password", {
+                                                    method: "POST",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({ username: forgotUsername })
+                                                });
+                                                const data = await response.json();
+                                                if (data.success) {
+                                                    toast({
+                                                        title: "Success",
+                                                        description: "Temporary password sent to your email.",
+                                                    });
+                                                    setIsForgotOpen(false);
+                                                } else {
+                                                    toast({
+                                                        variant: "destructive",
+                                                        title: "Error",
+                                                        description: data.message || "Failed to reset password",
+                                                    });
+                                                }
+                                            } catch (error: any) {
+                                                toast({
+                                                    variant: "destructive",
+                                                    title: "Error",
+                                                    description: error.message,
+                                                });
+                                            } finally {
+                                                setIsForgotLoading(false);
+                                            }
+                                        }}
+                                        disabled={isForgotLoading || !forgotUsername}
+                                    >
+                                        {isForgotLoading ? "Sending..." : "Send Reset Email"}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col space-y-2 text-center text-sm text-slate-600">

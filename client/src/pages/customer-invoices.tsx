@@ -48,7 +48,7 @@ export default function CustomerInvoicesPage() {
 
     const { user } = useAuthStore();
     const { data: invoicesData, isLoading } = useQuery({
-        queryKey: ["/api/invoices"],
+        queryKey: user?.role === 'customer' ? ["/api/flow/invoices"] : ["/api/invoices"],
     });
 
     const { data: brandingData } = useQuery({
@@ -58,16 +58,9 @@ export default function CustomerInvoicesPage() {
     const allInvoices = (invoicesData as any)?.data || [];
     const branding = (brandingData as any)?.data;
 
-    // Filter invoices by customer email/ID if the user is a customer
-    const invoices = user?.role === 'customer' 
-        ? allInvoices.filter((inv: any) => {
-            const customerId = String(inv.customerId || inv.customer_id);
-            const userCustomerId = String(user.customerId || user.id);
-            // Check for matching customerId or matching email
-            return customerId === userCustomerId || 
-                   (inv.customerEmail && inv.customerEmail.toLowerCase() === user.email?.toLowerCase());
-          })
-        : allInvoices;
+    // For customers, the /api/flow/invoices endpoint already filters by customer
+    // For admins, we use the regular /api/invoices endpoint
+    const invoices = allInvoices;
 
     const payMutation = useMutation({
         mutationFn: async ({ id, amount }: { id: string, amount: number }) => {
